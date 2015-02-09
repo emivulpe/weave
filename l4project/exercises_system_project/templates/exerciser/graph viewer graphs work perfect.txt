@@ -1,0 +1,642 @@
+{% extends 'exerciser/teacher_interface_base.html' %}
+{% load static %}
+{% block links %} 	
+	<link rel="stylesheet" type="text/css" href="{% static 'css/ui.dropdownchecklist.themeroller.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui-1.8.4.custom.css' %}" />
+	{% endblock %}
+{% block style %}
+	<style>
+		#container{
+			min-width: 310px;
+			height: 400px;
+			margin: 0 auto;
+		}
+		.ui-autocomplete{
+			margin:0;
+			padding:0;
+			width:100px;
+
+		}
+		
+		.ui-menu-item{
+			list-style-type:none;
+
+		}
+	</style>
+{% endblock %}
+
+{% block body_block %}
+<div class="container" style="background:gray;width: 100%;">
+	<select id="group_year" class="year choice_selector">
+		<option value="" disabled selected style="display:none;">Select academic year...</option>
+		{% for year in academic_years %}
+			<option value="{{year.start}}" >{{ year.start}}/{{ year.start|add:"1" }}</option>
+		{% endfor %}
+	</select>
+	<select id="group_list" class="group choice_selector">
+		<option value="" disabled selected style="display:none;">Select group...</option>
+	</select>
+
+	<select id="statistics_options" class="choice_selector">
+		<option id="stats_info" value="" disabled selected style="display:none;">Select data type...</option>
+		<option value="time">Average Time</option>
+		<option value="answers">Question Answers</option>
+		<option value="summary_data">Class Summary</option>
+		<option value="class_steps">Class Steps</option>
+	</select>
+	<span class="ui-widget" style="font-family:inherit;">
+		<input id="application" class="choice_selector" placeholder="Select application..." style="font-family:inherit; font-size:12pt;">
+	</span>
+
+	<select id="question_list" class="choice_selector" style="max-width:200px;display:none;">
+		<option id="question_info" value="" disabled selected style="display:none;">Select question...</option>
+	</select>
+	<!--
+	<select id="s1" multiple="multiple">
+		<option value="a">Alice</option>
+		<option value="b">Bob</option>
+		<option value="c">Christian</option>
+		<option value="d">Daniel</option>
+	</select> -->
+	<button id="set_data_button" class="autocompare choice_selector">View data</button>
+	<i class="fa fa-info-circle"></i><span class="landing-text">Please select!</span>
+</div>
+	<div id="container" style="display:none;width:100%; min-height:80vh; text-align: center;font-size: 12pt; font-weight: bold;"> </div>
+	
+	<table id="summary_data" border="1" style="display:none;margin: 0 auto">
+		<caption id="summary_data_caption" style="text-align: center;margin:auto;">test</caption>
+		<tr>
+			<th>Student ID</th>
+			<th>Total time</th>
+			<th>Times revisited</th>
+			<th>Last step</th>
+		</tr>
+	</table>
+
+{% endblock %}
+
+{% block javascripts %}
+	<script src="/static/js/highcharts.js"></script>
+	<script src="/static/js/exporting.js"></script>
+	<script src="/static/js/customEvents.js"></script>
+
+<script src="http://code.highcharts.com/modules/data.js"></script>
+
+
+<!-- Additional files for the Highslide popup effect -->
+<script type="text/javascript" src="http://www.highcharts.com/media/com_demo/highslide-full.min.js"></script>
+<script type="text/javascript" src="http://www.highcharts.com/media/com_demo/highslide.config.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/static/js/ui.dropdownchecklist-1.1-min.js"></script>
+<link rel="stylesheet" type="text/css" href="http://www.highcharts.com/media/com_demo/highslide.css" />
+
+	<script>
+
+		// extract some relevant information from the context
+		{% autoescape off %}
+		var app_questions_dict = {{app_questions_dict}}; // Mapping between an application and the questions for the application 
+		
+		var applications = {{application_names}}; // List of all the application names
+		
+		var year_group_dict = {{groups}} // Mapping between academic years and groups for them
+		{% endautoescape %}
+
+		
+function getStepData(step){
+	selected_application=$("#application").val();
+	console.log(selected_application+"TEST APPP");
+	selected_group=document.getElementById("group_list").value;
+	var selected_year = document.getElementById("group_year").value
+	var request = $.get('/exerciser/get_step_data/',
+	{	
+		application:selected_application,
+		group:selected_group, 
+		step:step,
+		year:selected_year
+	});
+	request.done(function(selected_data) {
+		console.log(selected_data);
+		var option_categories=[];
+		var option_data=[];
+		for (i = 0; i < selected_data.length; i++) { 
+			console.log(selected_data[i]+"SELDI");
+			for (var option in selected_data[i]) {
+				console.log(option+"OPTION");
+				option_categories.push(option);
+				option_data.push({"y":selected_data[i][option]});
+			}
+		}
+       var chart = $('#container').highcharts();
+       chart.series[0].setData(option_data);
+	});
+}
+		var chart_num=0; // uniquely identifies generated charts
+		
+		
+		/*
+			TODO Maybe refactor
+		*/
+		
+		var step=0; // IMPORTANT! Maybe refactor
+		
+		
+		function getNextStepData() {
+			step++;
+			console.log(step);
+			getStepData(step);
+		};
+		
+		function getPrevStepData() {
+			step--;
+			console.log(step);
+			getStepData(step);
+		};
+		
+		
+		/*
+			ENDTODO
+		*/
+		
+		$(function () {
+
+			// Logic for handling selection of requested information
+			$('#statistics_options').on('change', function() {
+			
+				selected_option = document.getElementById("statistics_options").value; 
+				
+				// Apply logic specific to the answers selection
+				if (this.value=="answers"){
+					$("#application").val(''); // Reset applications in case the user had selected an application without questions
+					$( "#application" ).autocomplete('option', 'source', Object.keys(app_questions_dict)); // Change the autocomplete list to the relevant applications only ( i.e. the ones that have questions)
+					$("#question_list").show(); // Show the selection for the questions
+				}
+				
+				// Apply logic specific for any selection apart from answers
+				else{
+					$( "#application" ).autocomplete('option', 'source', applications); // Change the autocomplete list to all applications
+					$("#question_list").hide(); // Hide the questions selection -no interest in being there
+				}
+			});
+
+			// Update the question selection to the questions for the selected application
+			$( "#application" ).blur(function() {
+				selected_option = document.getElementById("statistics_options").value; 
+				if (selected_option=="answers"){
+					selected_application=$("#application").val();
+					addQuestions(selected_application);
+				}
+			});
+			
+			// Delete irrelevant questions from question selection list in case answers option in requested
+			$( "#application" ).focus(function() {
+				selected_option = document.getElementById("statistics_options").value; 
+				if (selected_option=="answers"){
+					$("#question_info").prop("selected",true);
+					$("#question_list").children().not(':first').remove();
+				}
+			});
+			function seriesFormat(el,selectedOption){
+				console.log(selectedOption+"SEL OPTION SERIES");
+				if (selectedOption == "time"){
+					return Highcharts.numberFormat(el.y,1) + ' s (' + el.point.revisited_count + ')' 
+				}
+				else if(selectedOption == "answers"){
+					return el.y + ' times'
+				}
+				else if (selectedOption == "class_steps"){
+					return Highcharts.numberFormat(el.y,1) + ' s'
+				}
+				else{
+					return el.y
+				}
+			}
+			
+			
+			function tooltipFormat(el,selectedOption) {
+				console.log(selectedOption+"SEL OPTION TOOLTIP");
+				if(selectedOption=="time"){
+					return ' ' +
+						'Average time: ' + Highcharts.numberFormat(el.point.y, 1) +' s<br />';
+						'Revisited: ' + el.point.revisited_count + ' times<br />' +
+						'Explanation: ' + el.point.explanation_start + '<br />';
+				}
+				else if (selectedOption=="answers"){
+					return 'Times Chosen: ' + el.point.y + '<br/>' +
+							'Students: ' + el.point.students;
+				}
+				else if (selectedOption=="class_steps"){
+					return "Time: " + Highcharts.numberFormat(el.point.y,1) + " s";
+				}
+				else {
+					return el.point.y;
+				}
+			}
+			function drawTimeChart(selectedApplication,selectedGroup,selectedYear){
+				chartType="line";
+				selectedOption="time";
+				var categories=[];
+				var sel_data=[];
+				var chartSubtitle="";
+				var xAxisTitle="Steps";
+				var yAxisTitle="Seconds";
+				var seriesName="Average time";
+				//var seriesFormat = Highcharts.numberFormat(this.y,1) + ' s (' + this.point.revisited_count + ')';
+				/*var tooltipFormat = ' ' +
+									'Average time: ' + Highcharts.numberFormat(this.point.y, 1) +' s<br />'+
+									'Revisited: ' + this.point.revisited_count + ' times<br />' +
+									'Explanation: ' + this.point.explanation_start + '<br />';*/
+				var request = $.get('/exerciser/update_graph_time/', {app_name:selectedApplication, group:selectedGroup, year:selectedYear})
+				
+				request.done(function(selected_data) {
+					if(Object.getOwnPropertyNames(selected_data).length != 0){
+						sel_data=selected_data["data"];
+						console.log(sel_data.length + "LEN");
+						questionSteps=selected_data["question_steps"];
+						for (i = 0; i < sel_data.length; i++) { 
+							if(questionSteps.indexOf(i)  != -1){
+								categories[i]="? " + (i+1);
+							}
+							else{
+								categories[i]=(i+1);
+							}
+						}
+						drawChart("container",selectedOption,chartType,selectedApplication,selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,seriesFormat,chartClickHandler,questionSteps, seriesName,sel_data,tooltipFormat,selectedYear);
+					}
+					else{
+						$('#container').find('.highcharts-container').hide();
+						$('#container').html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>There are no statistics for the current selection</span><div>");
+					}
+				
+				});
+			}
+			
+			function drawClassStepsChart(selectedApplication,selectedGroup,selectedYear){
+				xAxisTitle="Students";
+				yAxisTitle="Time";
+				seriesName="Time";
+				chartType="column";
+				selectedOption="class_steps";
+				chartSubtitle="";
+				//seriesFormat = Highcharts.numberFormat(this.y,1) + ' s';
+				//tooltipFormat = "Time: " + Highcharts.numberFormat(this.point.y,1) + " s";;
+
+				$("#container").before("<button id='prev_step_button' onclick='getPrevStepData()'>Prev</button>");
+				$("#container").before("<button id='next_step_button' onclick='getNextStepData()'>Next</button>");
+				
+				var request = $.get('/exerciser/update_graph_class_steps/', {app_name:selectedApplication, group:selectedGroup, year:selectedYear})
+				
+				request.done(function(selected_data) {
+
+					if(selected_data.length != 0){
+						sel_data=selected_data;
+
+						var option_categories=[];
+						var option_data=[];
+						for (i = 0; i < sel_data.length; i++) { 
+							console.log(sel_data[i]+"SELDI");
+							for (var option in sel_data[i]) {
+								console.log(option+"OPTION");
+								if ((typeof option)=="string" && option!="students"){
+									option_categories.push(option);
+									option_data.push({"y":sel_data[i][option],"students":sel_data[i]["students"]});
+								}
+							}
+						}
+						sel_data=option_data;
+						categories=option_categories;
+						drawChart("container",selectedOption,chartType,selectedApplication,selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,seriesFormat,chartClickHandler,"", seriesName,sel_data,tooltipFormat,selectedYear);
+					}
+					else{
+						$('#container').find('.highcharts-container').hide();
+						$('#container').html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>There are no statistics for the current selection</span><div>");
+					}
+				});
+			}
+			
+			function drawAnswersChart(selectedApplication,selectedGroup,selectedYear){
+				xAxisTitle="Choices";
+				yAxisTitle="Times chosen";
+				seriesName="Times chosen";
+				chartType="column";
+				selectedOption="answers";
+				chartSubtitle="";
+				//seriesFormat = this.y + ' times';
+				//tooltipFormat ='Times Chosen: ' + this.point.y + '<br/>' +
+				//				'Students: ' + this.point.students;
+				question=document.getElementById("question_list").value;
+				var request = $.get('/exerciser/update_graph_answers/', {app_name:selectedApplication, group:selectedGroup, question:question, year:selectedYear})
+
+				request.done(function(selected_data) {
+
+					if(selected_data.length != 0){
+						sel_data=selected_data;
+						var option_categories=[];
+						var option_data=[];
+						for (i = 0; i < sel_data.length; i++) { 
+
+							for (var option in sel_data[i]) {
+								console.log(option+"OPTION");
+								if ((typeof option)=="string" && option!="students"){
+									option_categories.push(option);
+									option_data.push({"y":sel_data[i][option],"students":sel_data[i]["students"]});
+								}
+							}
+						}
+						sel_data=option_data;
+						categories=option_categories;
+						drawChart("container",selectedOption,chartType,selectedApplication,selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,seriesFormat,chartClickHandler,"", seriesName,sel_data,tooltipFormat,selectedYear);
+					}
+					else{
+						$('#container').find('.highcharts-container').hide();
+						$('#container').html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>There are no statistics for the current selection</span><div>");
+					}
+				});
+			}
+			
+			function drawChart(chartContainer,selectedOption,chartType, selectedApplication, selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,formatter1Funct,clickFunct,clickFunctParameter,seriesName,chartData,formatter2Funct,selectedYear){
+				$('#'+chartContainer).highcharts({
+					chart: {
+						type: chartType
+					},
+					title: {
+						text: selectedApplication + "- Group " + selectedGroup,
+					},
+					subtitle: {
+						text: chartSubtitle
+					},
+					xAxis: {
+						categories:categories,
+						title:{
+							text: xAxisTitle
+						}
+					},
+					yAxis: {
+						allowDecimals: false,
+						title:{
+							text: yAxisTitle
+						}
+					},
+					plotOptions: {
+						series: {
+							dataLabels: {
+								enabled: true,
+								formatter: function(){ return formatter1Funct(this,selectedOption)}
+								},
+								cursor: 'pointer',
+									point: {
+										events: {
+											click: function (e) { return clickFunct (e,clickFunctParameter,selectedOption, this,selectedApplication,selectedYear,selectedGroup) }
+										}
+								},
+								marker: {
+									lineWidth: 1
+								}
+							}
+					},
+					series: [{
+						showInLegend: false,
+						name: seriesName,
+						data: chartData,
+					}],
+					tooltip: {
+						formatter: function(){ return formatter2Funct(this,selectedOption) }
+					}
+				});
+			}
+			
+			function chartClickHandler(e,questionSteps,selectedOption,el,selectedApplication,selectedYear,selectedGroup){
+				if(selectedOption=="time"){
+					if(questionSteps.indexOf(el.x)!=-1){
+						hs.htmlExpand(null, {
+							pageOrigin: {
+								x: e.pageX || e.clientX,
+								y: e.pageY || e.clientY
+							},
+							headingText: el.series.name,
+							maincontentText: "	<div id='cont_"+chart_num+"'> </div><br/> ",
+							width: 600,
+							height:330
+						});
+						getQuestionData(selectedApplication,selectedYear,selectedGroup,el.x);
+					}
+					else{
+						hs.htmlExpand(null, {
+							pageOrigin: {
+								x: e.pageX || e.clientX,
+								y: e.pageY || e.clientY
+							},
+							headingText: "Step Explanation",
+							maincontentText: el.explanation
+						});
+					}
+				}
+			}
+			
+			// the button action
+			$('#set_data_button').click(function () {
+				$(".no_stats_info").remove(); // Clear any previous messages
+				selectedYear = document.getElementById("group_year").value // Get the selected year
+				selectedApplication=$("#application").val(); // Get the selected application
+				selectedGroup = document.getElementById("group_list").value; // Get the selected group
+				selectedOption = document.getElementById("statistics_options").value; 
+
+				if(selectedOption=="summary_data"){
+					$("#container").hide();
+					$("#summary_data").show();
+					drawClassSummaryTable(selectedApplication, selectedGroup, selectedYear);
+				}
+				else{
+					$("#container").show();
+					$("#summary_data").hide();
+					if (selectedOption=="time"){
+						drawTimeChart(selectedApplication,selectedGroup,selectedYear);
+					}
+					else if (selectedOption=="answers"){
+						drawAnswersChart(selectedApplication,selectedGroup,selectedYear);
+					}
+					else if (selectedOption=="class_steps"){
+						drawClassStepsChart(selectedApplication,selectedGroup,selectedYear);
+					}
+				}
+			});
+		
+		
+		function drawClassSummaryTable(selectedApplication, selectedGroup, selectedYear){
+			$(".student_info").remove();
+			$("#summary_data_caption").empty();
+
+			var selected_application="ClockExample";
+
+			var request = $.get('/exerciser/populate_summary_table/', {application:selectedApplication, group:selectedGroup, year:selectedYear})
+
+			request.done(function(summary_data) {
+
+				for (student in summary_data["selected_data"]){
+					$("#summary_data").append("<tr id='student_"+student+"' class='student_info'></tr>");
+					var studentData = summary_data[student];
+					$("#student_"+student).append("<td>" + student + "</td>");
+					$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["total_time"].toFixed(1) + "</td>");
+					$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["num_steps_revisited"] + "</td>");
+					$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["last_step"] + "</td>");
+
+				}
+				$("#summary_data_caption").append(selected_application + " (" + summary_data["total_steps"] + " steps)");
+
+						
+			});
+
+			$("#summary_data").show();
+		}
+
+		
+		// A function to show a graph for a chosen question
+		function getQuestionData(selectedApplication,selectedYear,selectedGroup,selectedStep){
+
+
+			
+				xAxisTitle="Choices";
+				yAxisTitle="Times chosen";
+				seriesName="Times chosen";
+				chartType="column";
+				selectedOption="answers";
+				chartSubtitle="";
+				//seriesFormat = this.y + ' times';
+				//tooltipFormat ='Times Chosen: ' + this.point.y + '<br/>' +
+				//				'Students: ' + this.point.students;
+				question=document.getElementById("question_list").value;
+			var request = $.get('/exerciser/question_graph/', {app_name:selectedApplication, group:selectedGroup,year:selectedYear,step:selectedStep});
+
+				request.done(function(selected_data) {
+
+				if(Object.getOwnPropertyNames(selected_data).length != 0){ // If something was returned
+					sel_data=selected_data["data"]; // Get the data
+					questionText=selected_data["question"]; // Get the question text
+
+					var option_categories=[]; // List for the categories
+					var option_data=[]; // List for the data
+					
+					// Populating the categories and the data
+					for (i = 0; i < sel_data.length; i++) { 
+
+							for (var option in sel_data[i]) {
+								console.log(option+"OPTION");
+								if ((typeof option)=="string" && option!="students"){
+									option_categories.push(option);
+									option_data.push({"y":sel_data[i][option],"students":sel_data[i]["students"]});
+								}
+							}
+						}
+						sel_data=option_data;
+						categories=option_categories;
+						drawChart("cont_"+chart_num,selectedOption,chartType,selectedApplication,selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,seriesFormat,chartClickHandler,"", seriesName,sel_data,tooltipFormat,selectedYear);
+					}
+					else{
+						$('#container').find('.highcharts-container').hide();
+						$('#container').html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>There are no statistics for the current selection</span><div>");
+					}
+				});
+		}		
+		});
+		// A function to populate the question selection with questions specific for the selected application
+		function addQuestions(selectedApplication){
+
+			for (var question_index in app_questions_dict[selectedApplication]){
+				var question = app_questions_dict[selectedApplication][question_index];
+				var option="<option value='" + question +"' >"+question + "</option>";
+				console.log(question);
+				$("#question_list").append(option);
+			}
+		}
+// Specify the list of applications for the autocomplete for the application selection
+$(function() {
+		$( "#application" ).autocomplete({minLength: 0,
+		  source: applications
+		}).focus(function() {
+		$(this).autocomplete("search", "");});
+});
+
+// Choose the available groups for the selected academic year
+$('.year').on('change', function() {
+	populateGroupList($(this).attr('id'),nextInDOM('.group', $(this)).attr('id'));
+});
+
+
+// NEEDS REFACTORING AND MERGING
+// A function to show the available groups for the selected academic year- generic
+function populateGroupList(year_element,group_element) {
+	$("#"+group_element).children().not(':first').remove(); // Remove any previously shown groups
+	var selected_year=$("#"+year_element).val(); // Get the selected year
+	group_list = year_group_dict[selected_year]; // Extract a list of the relevant groups
+	if(year_element=="year"){
+		$(".existing_groups_list").empty();
+	}
+	for (i = 0; i < group_list.length; i++) {
+		var group = group_list[i];
+		$("#"+group_element).append( "<option value='" + group +"'>" + group + "</option>" );
+		if(group_element=="group_entry"){
+			$(".existing_groups_list").append("<span class='appended_groups'>" + group + " </span>");
+		}
+	}
+	if (group_list.length==0){
+		$(".existing_groups_list").append("<span class='appended_groups'>None</span>");
+	}
+}
+
+/*
+//delete if not using
+ $("#s1").dropdownchecklist( { forceMultiple: true
+    , onComplete: function(selector) {
+        var values = "test ";
+        for( i=0; i < selector.options.length; i++ ) {
+            if (selector.options[i].selected && (selector.options[i].value != "")) {
+                if ( values != "" ) values += ";";
+                values += selector.options[i].value;
+            }
+        }
+	  	alert( values );
+    } 
+	, onItemClick: function(checkbox, selector){
+		var justChecked = checkbox.prop("checked");
+		var checkCount = (justChecked) ? 1 : -1;
+		for( i = 0; i < selector.options.length; i++ ){
+			if ( selector.options[i].selected ) checkCount += 1;
+		}
+	    if ( checkCount > 3 ) {
+			alert( "Limit is 3" );
+			throw "too many";
+		}
+	}
+});
+		
+*/
+
+
+//from here: http://stackoverflow.com/questions/12873027/jquery-forget-the-dom-structure-just-find-the-next-element-with-this-class/12873187#12873187
+function nextInDOM(_selector, _subject) {
+    var next = getNext(_subject);
+    while(next.length != 0) {
+        var found = searchFor(_selector, next);
+        if(found != null) return found;
+        next = getNext(next);
+    }
+    return null;
+}
+function getNext(_subject) {
+    if(_subject.next().length > 0) return _subject.next();
+    return getNext(_subject.parent());
+}
+function searchFor(_selector, _subject) {
+    if(_subject.is(_selector)) return _subject;
+    else {
+        var found = null;
+        _subject.children().each(function() {
+            found = searchFor(_selector, $(this));
+            if(found != null) return false;
+        });
+        return found;
+    }
+    return null; // will/should never get here
+}
+	</script>
+{% endblock %}
+

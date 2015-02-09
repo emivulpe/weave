@@ -1,0 +1,214 @@
+{% extends 'exerciser/base.html' %}
+
+{% block title %}Exercise!{% endblock %}
+
+{% block style %}
+	.brand-heading{
+		font-size: 36pt;
+	}
+{% endblock %}
+
+{% block body_block %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 text-center">
+				<br/><br/>
+				{% if request.session.registered %}
+					<br/><br/><br/><br/><br/><br/>
+					<strong>You are registered 
+					{% if request.session.teacher %} 
+						with teacher id {{request.session.teacher}} 
+					
+						{% if request.session.group %} 
+							with group id {{request.session.group}} 
+					
+							{% if request.session.student %} 
+								with student id {{request.session.student}} 
+							{% else %}
+								.
+							{% endif %}
+						{% else %}
+							.
+						{% endif %}
+					{% else %}
+						anonymously.
+					{% endif %}
+					</strong><br/>
+				{% else %}
+				<h1 class="details">Specify your details</h1>
+				<br>
+				<form id="detail_form" style="margin-top: 10px; margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;">
+
+					
+					<p id="teacher_details" class="details">Teacher ID: <input id = "teacher" type="text" name="TeacherId" style="margin-top: 10px; margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold;" /><i class="fa fa-question-circle" title="Enter the teacher id provided by your teacher or click on <No teacher ID> button to proceed."></i></p><br />
+					
+					<p id="buttons">
+						<input  id = "back" type="submit" value="Back" style="display:none;margin-top: 10px; margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;" onclick="backToTeacher()"/>
+						<input  id = "submit" class="save_teacher details" type="submit" value="Next" style="margin-top: 10px; margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;" onclick="saveTeacher()"/>
+						<input id = "no_id" class="details" type="submit" value="No teacher ID" style="margin-top: 10px; margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;"/>
+					</p>
+				</form>
+				<br>			
+
+				<strong id="success_message"></strong>
+				{% endif %}
+			</div>
+				
+			<div class="col-md-6 text-center">
+				<h1 class="brand-heading"><a href="#"><i class="fa fa-info landing-icon fa-lg fa-5x"></i><br><br><span class="landing-text">About Info</span></a></h1>
+			</div>
+		</div>			
+	</div>
+{% endblock %}
+
+
+{% block javascripts %}
+	<script type="text/javascript" src="/static/js/cookieAccessor.js"></script>
+	<script> 
+		console.log("Teacher {{request.session.teacher}}");
+		var csrftoken = getCookie('csrftoken');
+		var teacher_name="";
+		var group_name="";
+		var student_name="";
+		
+		
+		$('#detail_form').submit(function(e) {
+			e.preventDefault();	
+		});
+		
+		function storeDetails(){
+			$(".details").hide();
+			$("#application_list").show();
+			console.log("in store details");
+			$.post("/exerciser/save_session_ids/",{csrfmiddlewaretoken : csrftoken});
+		}
+		
+		
+		
+		
+		function backToTeacher(){
+		
+		}
+		
+		function backToGroup(){
+		
+		}
+				
+		
+		
+		$("#no_id").click(function (e){
+
+			storeDetails();
+			$("#success_message").text("Your details are stored!");
+			if(teacher_name==""){
+				console.log("Thank you! You can start using the system as anonymous user by selecting an application");
+			}
+			else if(group_name == ""){
+				console.log("You are registered with the teacher id " + teacher_name);
+			}
+			else if(student_name == ""){
+				console.log("You are registered with the teacher id " + teacher_name + " and group id " + group_name);
+			}
+			else{
+				console.log("You are registered with the teacher id " + teacher_name + " , group id " + group_name + " and student id " + student_name);
+			}
+		});
+		
+		
+
+		function saveStudent(){
+			console.log("click save group!!!!!!");
+			
+			$("#no_id").html('No student ID');
+
+			var student = $("#student").val();
+			
+
+			var request = $.post("/exerciser/register_student_with_session/",
+			{
+				student : student,
+				csrfmiddlewaretoken : csrftoken
+			});
+			request.done(function(success) {
+				console.log("weird");
+				if(success){
+					student_name=student;
+					console.log("REG");
+					//$("#success_message").text("Your details are stored!");
+					storeDetails();
+				}
+				else{
+					console.log("no such group");
+					$("#success_message").text("Sorry, but the student ID " + student + " is invalid. Please, try again, or continue anonymously!");
+				}
+			});
+		};
+		
+		function saveTeacher (){
+			var teacher = $("#teacher").val();
+			$("#teacher_details").hide()
+			$("#back").show()
+			$("#buttons").hide();
+			var request = $.post("/exerciser/register_teacher_with_session/",
+			{
+				teacher : teacher,
+				csrfmiddlewaretoken : csrftoken
+			});
+			request.done(function(reply) {
+				console.log("weird");
+				if(reply["success"]){
+					console.log("REG");
+					
+					teacher_name=teacher;
+					
+					//$("#success_message").text("Your details are stored!");
+					$("#teacher_details").after( "<p id='group_details' class='details'>Group ID: <select id='group_list' style='margin: 10px 5px 0 10px; padding: 5px; font-size: 12pt; font-weight: bold;'></select><i class='fa fa-question-circle' title='Choose the group your teacher assigned you to or click on <No group ID> button to proceed.'></i></p><br/>" );
+					$("#buttons").show();
+					for (var index in reply["groups"]) {
+						var group="<option value='" + reply["groups"][index] +"' >"+reply["groups"][index] + "</option>";
+						$("#group_list").append(group);
+					}
+
+					$("#submit").attr('onclick', 'saveGroup()');
+					$("#no_id").val('No group ID');
+					//$("#success_message").text("Your details are stored!");
+				}
+				else{
+					console.log("no such group");
+					$("#success_message").text("Sorry, but teacher ID " + teacher + " and group ID " + teacher + " are invalid. Please, try again, or continue anonymously!");
+				}
+			});
+		}
+		
+		function saveGroup(){
+			$("#group_details").hide()
+			$("#buttons").hide();
+			var group=document.getElementById("group_list").value;
+			console.log(group);
+			var request = $.post("/exerciser/register_group_with_session/",
+			{
+			group : group,
+			csrfmiddlewaretoken : csrftoken
+			});
+			request.done(function(success) {
+				console.log("weird");
+				if(success){
+					console.log("REG");
+					
+					group_name=group;
+					$("#group_details").after("<p id='student_details' class='details' >Student ID: <input id = 'student' type='text' name='StudentId' style='margin-top: 10px; margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold;' /><i class='fa fa-question-circle' title='Enter the student ID your teacher assigned to you or click on <No student ID> button to proceed.'></i></p>");
+					$("#buttons").show();
+					$("#submit").attr('onclick', 'saveStudent()');
+					$("#submit").val('Submit');
+					$("#no_id").val('No student ID');
+					//$("#success_message").text("Your details are stored!");
+				}
+				else{
+					console.log("no such group");
+					$("#success_message").text("Sorry, but the group ID " + group + " is invalid. Please, try again, or continue anonymously!");
+				}
+			});
+		}
+
+	</script>
+{% endblock %}

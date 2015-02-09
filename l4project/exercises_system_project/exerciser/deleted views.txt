@@ -1,0 +1,50 @@
+"""
+### Refactored ###
+@login_required		
+def get_question_data(request):
+	try:
+		app_name=request.GET['app_name']
+		year=request.GET['year']
+		group_name=request.GET['group']
+		step_num=request.GET['step']
+	except KeyError:
+		print "error"
+		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
+
+	teacher_username = request.user
+	try:
+		# get teacher
+		user=User.objects.filter(username=teacher_username)[0]
+		teacher=Teacher.objects.filter(user=user)[0]
+		academic_year=AcademicYear.objects.filter(start=year)[0]
+		group = Group.objects.filter(teacher = teacher, name = group_name,academic_year=academic_year)[0]
+		application=Application.objects.filter(name=app_name)[0]
+		step=Step.objects.filter(application=application,order=step_num)[0]
+		question=Question.objects.filter(application=application,step=step)[0]
+	except IndexError:
+		print "error"
+		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
+
+	selected_data={}
+	question_text=question.question_text
+	all_options=Option.objects.filter(question=question)
+	question_records = QuestionRecord.objects.filter(application=application, question=question, teacher=teacher,group=group)
+	answers=question_records.values('answer').annotate(count=Count('answer')).order_by('answer')
+
+	sd=[]
+	for option in all_options:
+		records_for_option=question_records.filter(answer=option)
+			times_chosen=len(records_for_option)
+			student_list=[]
+			for record in records_for_option:
+				if record.student != None:
+					student_id=record.student.student_id
+					print student_id
+					if student_id not in student_list:
+						student_list.append(student_id)
+						sd.append({option.content:times_chosen,'students':student_list})
+	selected_data['question']=question_text
+	selected_data['data']=sd
+	print sd
+	return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")	
+"""
