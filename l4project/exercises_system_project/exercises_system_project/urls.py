@@ -18,7 +18,7 @@ urlpatterns = patterns('',
 )
 
 if settings.DEBUG:
-    urlpattens += patterns(
+    urlpatterns += patterns(
         url(r'^weave/', include('exerciser.urls')),
     ,)
 else:
