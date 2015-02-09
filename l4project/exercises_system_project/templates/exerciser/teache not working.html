@@ -125,7 +125,7 @@
 					<strong id="student_success_message"></strong>
 				</div>
 				<div class="col-md-4 text-center">
-					<h1 class="brand-heading"><a href="/exerciser/statistics/"><i class="fa fa-bar-chart landing-icon fa-lg fa-5x"></i><br><br><span class="landing-text">View Statistics</span></a></h1>
+					<h1 class="brand-heading"><a href="/weave/statistics/"><i class="fa fa-bar-chart landing-icon fa-lg fa-5x"></i><br><br><span class="landing-text">View Statistics</span></a></h1>
 				</div>
 			</div>			
 		</div>
@@ -145,7 +145,7 @@
 
 						<h1>Register here!</h1><br />
 						
-						<form id="user_form" method="post" action="/exerciser/register/" enctype="multipart/form-data">
+						<form id="user_form" method="post" action="/weave/register/" enctype="multipart/form-data">
 							{% csrf_token %}
 
 							<!-- Display each form. The as_p method wraps each element in a paragraph
@@ -164,7 +164,7 @@
 					{% else %}
 						<h1>Register here!</h1><br />
 
-						<form id="user_form" method="post" action="/exerciser/register/" enctype="multipart/form-data">
+						<form id="user_form" method="post" action="/weave/register/" enctype="multipart/form-data">
 							{% csrf_token %}
 
 							<!-- Display each form. The as_p method wraps each element in a paragraph
@@ -180,7 +180,7 @@
 				</div>
 				<div class="col-md-6 text-center">
 					<h1>Login to Exerciser</h1>
-					<form id="login_form" method="post" action="/exerciser/login/"><br>
+					<form id="login_form" method="post" action="/weave/login/"><br>
 						{% csrf_token %}
 						<p><label for="id_username">Username:</label> <input id="id_username" maxlength="30" name="username" type="text"></p>
 						<p><label for="id_password">Password:</label> <input id="id_password" name="password" type="password"></p>
@@ -302,7 +302,7 @@
 		
 		
 		$('#get_group_list_button').click(function () {
-			request = $.post("/exerciser/get_group_list/",{
+			request = $.post("/weave/get_group_list/",{
 					csrfmiddlewaretoken : csrftoken,
 			});
 		});
@@ -316,7 +316,7 @@
 			var year=document.getElementById("year").value; // Get the chosen academic year
 
 			// Send a request to register a group
-			request = $.post("/exerciser/create_group/",{
+			request = $.post("/weave/create_group/",{
 				csrfmiddlewaretoken : csrftoken,
 				teacher : "{{ user.username }}",
 				group : chosen_group,
@@ -356,7 +356,7 @@
 			var year=document.getElementById("year").value;
 
 			// Send a request to update a group
-			request = $.post("/exerciser/update_group/",{
+			request = $.post("/weave/update_group/",{
 				csrfmiddlewaretoken : csrftoken,
 				teacher : "{{ user.username }}",
 				group : chosen_group,
@@ -419,7 +419,7 @@
 				//var request;
 				//var chosen_option="";
 				//if(option=="group"){
-					request = $.post("/exerciser/create_group/",{
+					request = $.post("/weave/create_group/",{
 						csrfmiddlewaretoken : csrftoken,
 						teacher : "{{ user.username }}",
 						group : chosen_group,
@@ -460,7 +460,7 @@
 				console.log(num_students+"num");
 				console.log(chosen_group+"group");
 
-					request = $.post("/exerciser/update_group/",{
+					request = $.post("/weave/update_group/",{
 						csrfmiddlewaretoken : csrftoken,
 						teacher : "{{ user.username }}",
 						group : chosen_group,
@@ -497,7 +497,7 @@
 			var chosen_group = document.getElementById("group").value;
 			var selected_year=$("#group_year").val();
 			var variables="?group="+chosen_group+"&teacher={{ user.username }}&year="+selected_year;
-			window.location="/exerciser/get_group_list"+variables;
+			window.location="/weave/get_group_list"+variables;
 		});
 
 function isNumber(evt){

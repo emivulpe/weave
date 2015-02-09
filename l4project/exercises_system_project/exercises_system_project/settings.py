@@ -74,7 +74,10 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = '/static/'
+if DEBUG:
+    STATIC_URL = '/static/'
+else:
+    STATIC_URL = '/weave/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (

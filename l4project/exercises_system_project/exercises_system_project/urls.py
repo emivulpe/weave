@@ -15,8 +15,16 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-	url(r'^exerciser/', include('exerciser.urls')),
 )
+
+if settings.DEBUG:
+    urlpattens += patterns(
+        url(r'^weave/', include('exerciser.urls')),
+    ,)
+else:
+    urlpatterns += patterns(
+        url(r'^', include('exerciser.urls')),
+    ,)
 
 
 # UNDERNEATH your urlpatterns definition, add the following two lines:
