@@ -76,9 +76,9 @@ STATIC_ROOT = ''
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 if DEPLOYED:
-    STATIC_URL = '/static/'
-else:
     STATIC_URL = '/weave/static/'
+else:
+    STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -112,6 +112,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'exerciser.disable.DisableCSRF',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -152,6 +153,12 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
+if DEPLOYED:
+    log_filename = '/var/www/DJANGO/weave/mysite/weave.log'
+else:
+    log_filename = 'C:\Users\Emi\mysite.log'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -178,7 +185,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'C:\Users\Emi\mysite.log',
+            'filename': log_filename,
             'formatter': 'verbose'
         },
     },
