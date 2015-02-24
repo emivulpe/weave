@@ -319,7 +319,7 @@ function getStepData(step){
 				categories=[];
 				var request = $.get(url, selectedItems)
 				console.log(url+"url");
-				alert(selectedOption);
+				//alert(selectedOption);
 				request.done(function(selected_data) {
 					console.log(selected_data+"DAA");
 					if ("error" in selected_data){
@@ -347,7 +347,8 @@ function getStepData(step){
 							else if(selectedOption=="answers" || selectedOption=="class_steps"){
 								sel_data=selected_data["data"]; // Get the data
 								chartSubtitle=selected_data["question"]; // Get the question text
-								alert(chartSubtitle);
+								
+//alert(chartSubtitle);
 								var option_categories=[]; // List for the categories
 								var option_data=[]; // List for the data
 								
@@ -691,7 +692,7 @@ function populateGroupList(year_element,group_element) {
                 values += selector.options[i].value;
             }
         }
-	  	alert( values );
+	  	//alert( values );
     } 
 	, onItemClick: function(checkbox, selector){
 		var justChecked = checkbox.prop("checked");
