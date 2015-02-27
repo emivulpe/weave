@@ -270,7 +270,9 @@
 <div id="success_dialog" title="Success message" style="display:none;">
   <span id = "success_message"></span>
 </div>
-{% if user.is_authenticated and not request.session.questionnaire_asked %}
+
+
+<!--{% if user.is_authenticated and not request.session.questionnaire_asked %}
 <div id="questionnaire_dialog" title="Questionnaire">
 	<form id="questionnaire_form" action="/weave/submit_questionnaire/" method="post">
 		{% csrf_token %}
@@ -287,10 +289,12 @@
 			{% endfor %}
 		</table>
 		
-		<!--<input type="submit" value="Submit" />-->
 	</form>
 </div>
+
 {% endif %}
+
+-->
 <div id="consent_dialog" title="Consent form" style="margin:20px;display:none;">
   <div id = "consent_message">
   <strong>Information Sheet: Testing the extent to which a new educational tool fits the current educational process in schools</strong>

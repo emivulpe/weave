@@ -287,7 +287,7 @@ def register_group_with_session(request):
 @requires_csrf_token
 def save_session_ids(request):
 	print "in save"
-	request.session['registered']=True
+	request.session['student_registered']=True
 	print "saving..."
 	#return HttpResponse("{}",content_type = "application/json")
 	return HttpResponseRedirect('/weave/')
@@ -404,8 +404,8 @@ def reset_session(request):
 	if 'student' in request.session:
 		del request.session['student']
 		print "s"
-	if 'registered' in request.session:
-		del request.session['registered']
+	if 'student_registered' in request.session:
+		del request.session['student_registered']
 		print "r"
 	
 	request.session.delete()
@@ -505,7 +505,7 @@ def submit_questionnaire(request):
 ### Refactored ###
 def application(request, application_name_url):
 	context = RequestContext(request)
-	if 'registered' in request.session:
+	if 'student_registered' in request.session:
 		
 
 		# Change underscores in the category name to spaces.

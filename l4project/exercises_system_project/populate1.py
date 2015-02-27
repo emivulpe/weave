@@ -11,48 +11,56 @@ def populate(filepath):
 	for process in root:
 		processAttrDict = process.attrib
 		application = get_application(processAttrDict)
-		for step in process:
-			stepAttrDict = step.attrib
-			s = add_step(application, stepAttrDict)
-			for element in step: 
-				if element.tag == 'change':
-					add_change(application,s,element)
-				elif element.tag == 'explanation':
-					add_explanation(s,element)
+		if application is not None:
+			for step in process:
+				stepAttrDict = step.attrib
+				s = add_step(application, stepAttrDict)
+				if s is not None:
+					for element in step: 
+						if element.tag == 'change':
+							add_change(application,s,element)
+						elif element.tag == 'explanation':
+							add_explanation(s,element)
 
 
 
-    # Print out what we have added to the user.
-	
-	
+	# Print out what we have added to the user.
 
+# All exceptions handled
 def get_application(attributesDict):
-	app_name = attributesDict['app']
-	application = Application.objects.get(name = app_name)
-	return application
+	try:
+		app_name = attributesDict['app']
+	except KeyError:
+		return None
+	try:
+		application = Application.objects.get(name = app_name)
+		return application
+	except ObjectDoesNotExist:
+		return None
 	
 def add_step(application, attributesDict):
-    order = attributesDict['num']
-    s = Step.objects.get_or_create(application=application, order = order)[0]
-    return s
+	try:
+		order = attributesDict['num']
+	except KeyError:
+		return None
+	try:
+		s = Step.objects.get_or_create(application=application, order = order)[0]
+		return s
+	except (IntegrityError, ObjectDoesNotExist):
+		return None
 
 #assumes that fragment and operation appear at most once. If more, the last value is taken
 def add_change(application, step, element):
 	fragment = None
 	operation = ''
 	document = ''
-	
-	
-	for child in element:
-		#print(child.tag)
+	try:
 		for child in element:
 			if child.tag == 'fragname':
 				fragmentId = child.attrib['id']
-				#print('fragment', fragmentId)
 				fragment = Fragment.objects.get(id = fragmentId)
 			elif child.tag == 'operation':
 				operation = child.text
-				#print(operation)
 			elif child.tag == 'docname':
 				documentName = child.text
 				document = Document.objects.get(name = documentName)
@@ -66,16 +74,21 @@ def add_change(application, step, element):
 					o = Option.objects.get_or_create(question = question, number = number, content = content)[0]
 			else: 
 				print(child.tag)
+
 		if operation != 'Ask Answer':
 			c = Change.objects.get_or_create(document = document, step = step, fragment = fragment, operation = operation)[0]
 		else:
 			c = Change.objects.get_or_create(document = document, step = step, question = question, operation = operation)[0]
+	except (IntegrityError, ObjectDoesNotExist, KeyError):
+		pass
 			
 def add_explanation(step, element):
 	text = element.text
 	text = text.replace('\n','<br>').replace('\r', '<br>');
-	e = Explanation.objects.get_or_create(step = step, text = text)[0]
-	return e
+	try:
+		e = Explanation.objects.get_or_create(step = step, text = text)[0]
+	except:
+		pass
 """	
 def add_question(step, question):
 	questionAttributesDict = question.attrib
@@ -92,7 +105,9 @@ def add_question(step, question):
 """
 # Start execution here!
 if __name__ == '__main__':
-    print "Starting DocumentFragment population script..."
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exercises_system_project.settings')
-    from exerciser.models import Step, Change, Question, Explanation, Option, Fragment, Document, Application
-    populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects\cs1ct\Processes.xml")
+	print "Starting DocumentFragment population script..."
+	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exercises_system_project.settings')
+	from exerciser.models import Step, Change, Question, Explanation, Option, Fragment, Document, Application
+	from django.db import IntegrityError
+	from django.core.exceptions import ObjectDoesNotExist
+	populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects_new\Processes.xml")

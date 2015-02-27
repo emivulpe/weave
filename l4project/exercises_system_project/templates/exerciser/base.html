@@ -84,7 +84,7 @@
 	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
 	<script>
 		console.log("{{request.session.registered}}"+"test");
-		if ("{{request.session.registered}}" == ""){
+		if ("{{request.session.student_registered}}" == ""){
 			$("#application_list").hide();
 		}
 		$("#interface").css("padding-top",$("#navbar").height());

@@ -65,7 +65,7 @@ class Fragment(models.Model):
 	order = models.IntegerField()
 
 	def __unicode__(self):
-		return " ".join((self.text, self.id))
+		return " ".join((self.text))
 		
 	def __init__(self, *args, **kwargs):
 		super(Fragment, self).__init__(*args, **kwargs)
@@ -124,7 +124,7 @@ class Change(models.Model):
 			result = []
 			fragments = Fragment.objects.filter (document = self.document)
 			for fragment in fragments:
-				result.append([fragment.id, 'show'])
+				result.append([fragment.id, 'showall'])
 			return result
 		elif self.operation == 'Ask Answer':
 			question_text = self.question.question_text

@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 import json
+import sys
 
 
 def populate(filepath):
@@ -80,4 +81,9 @@ if __name__ == '__main__':
 	print "Starting DocumentFragment population script..."
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exercises_system_project.settings')
 	from exerciser.models import FragmentStyle, Document, DocumentType, FragmentType
+	from django.db import IntegrityError
+	#if len(sys.argv) <= 1:
+	#	print "Please specify the path for the file Doc Types.xml"
+	#else:
+	#print 'Argument List:', str(sys.argv)
 	populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects\cs1ct\Doc Types.xml")

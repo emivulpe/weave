@@ -15,7 +15,15 @@ var textareaNum=0;
 function goToStep(direction) {
 
 	totalSteps = steps.length; // Total number of possible steps
-	$("*[id^='fragment_']").css("background-color", "transparent");
+	
+	
+	$("*[id^='fragment_']").each(function() {
+	console.log($(this).css("background-color"));
+		if($(this).css("background-color") == "rgb(255, 224, 255)"){
+			$(this).css("background-color", "transparent");
+		}
+	});
+	//$("*[id^='fragment_']").css("background-color", "transparent");
 	$('#explanation').html("");
 	direction = direction;
 	if(currentStep == 0 && direction == "next"){
@@ -77,7 +85,7 @@ function goToStep(direction) {
 		}
 		if(currentStep>0){
 			var now = new Date().getTime();			
-			$.post("/exerciser/log_info_db/",
+			$.post("/weave/log_info_db/",
 			{
 				time : (now - lastTime) / 1000,
 				step : currentStep,
@@ -127,6 +135,7 @@ function goToStep(direction) {
 
 // When we go back, we need to undo what we did. So this maps an action to its inverse (e.g. when you revert a show, you hide it).
 var undoMapping = {
+	'showall': 'hide',
 	'show': 'hide',
 	'hide': 'show',
 	'highlight' : 'unhighlight',
@@ -156,20 +165,23 @@ function doReset() {
 function doAction(fragment, action) {
 	var fragmentId = "fragment_" + fragment;
 	var object = $('#' + fragmentId);
-	
 	if (action == "show") {
 		object.show();
-		object.css("background-color", "#CD96CD");
-		var contactTopPosition = object.position().top;
+		object.css("background-color", "rgb(255, 224, 255)");
+		contactTopPosition = object.position().top;
 		object.parent().animate({scrollTop: contactTopPosition});
 	}
-	
+	else if (action == "showall") {
+		object.show();
+	}
 	else if (action == "hide") {
 		object.hide();
 	}
 	
 	else if (action == "highlight") {
-		object.css("background-color", "#E3A869");
+		object.css("background-color", "rgb(255, 224, 194)");
+		contactTopPosition = object.position().top;
+		object.parent().animate({scrollTop: contactTopPosition});
 	}
 	
 	else if (action == "unhighlight") {
@@ -234,7 +246,7 @@ $(document).ready(function ()
 			e.preventDefault();
 			var now = new Date().getTime();
 			if(currentStep>0){
-				$.post("/exerciser/log_question_info_db/",
+				$.post("/weave/log_question_info_db/",
 				{	time : (now - lastTime) / 1000,
 					step : currentStep,
 					answer : answer,
@@ -252,7 +264,7 @@ $(document).ready(function ()
 });
 
 function ShowDialog(){
-	$("#overlay").show();
+	//$("#overlay").show();
 		$("#dialog").css({
 		"position": "absolute",
 		"top": ((($(window).height() - $("#dialog").outerHeight()) / 2) + $(window).scrollTop() + "px"),
@@ -260,7 +272,7 @@ function ShowDialog(){
 		});
 	$("#dialog").fadeIn(300);
 	
-	$("#overlay").unbind("click");
+	//$("#overlay").unbind("click");
 }
 
 function HideDialog(){
