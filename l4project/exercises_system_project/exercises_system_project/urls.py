@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 )
 
-if False:
+if True:
     urlpatterns = patterns('',
         # Examples:
         # url(r'^$', 'exercises_system_project.views.home', name='home'),

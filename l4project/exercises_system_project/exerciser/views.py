@@ -100,6 +100,7 @@ def log_info_db(request):
 def log_question_info_db(request):
 
 	time_on_question = request.POST['time']
+	
 	current_step = request.POST['step']
 	session_id = request.session.session_key
 	application_name = request.POST['example_name']
@@ -110,12 +111,12 @@ def log_question_info_db(request):
 	application = Application.objects.filter(name=application_name)[0]
 	step = Step.objects.filter(application=application, order=current_step)[0]
 	question = Question.objects.filter(step=step)[0]
+	
+	usage_record = UsageRecord(application = application, session_id = session_id, time_on_step = time_on_question, step = step, direction = "next")
 	question_record=QuestionRecord(application=application,question=question, answer_text=answer_text)
 	if multiple_choice_question=="true":
 		answer = Option.objects.filter(question=question,content=answer_text)[0]
 		question_record.answer=answer
-	
-
 
 	if teacher_name != None:
 		user=User.objects.filter(username=teacher_name)
@@ -123,6 +124,7 @@ def log_question_info_db(request):
 		if len(teacher)>0:
 			teacher=teacher[0]
 			question_record.teacher = teacher
+			usage_record.teacher = teacher
 			year=request.session.get("year",None)
 			group_name=request.session.get("group",None)
 			if group_name != None and year != None:
@@ -130,6 +132,7 @@ def log_question_info_db(request):
 				group = Group.objects.filter(teacher=teacher, academic_year = academic_year, name = group_name)
 				if len(group) > 0:
 					group=group[0]
+					usage_record.group = group
 					question_record.group = group
 					
 					student_name=request.session.get("student", None)
@@ -138,7 +141,8 @@ def log_question_info_db(request):
 						if len(student) > 0:
 							student=student[0]
 							question_record.student = student
-
+							question_record.student = student
+	usage_record.save()
 	question_record.save()
 	print("test success")
 	return HttpResponse("{}",content_type = "application/json")
@@ -597,14 +601,18 @@ def get_groups(request):
 	teacher_username = request.user
 	try:
 		user=User.objects.filter(username=teacher_username)[0]
+		print user, "U"
 		teacher=Teacher.objects.filter(user=user)[0]
+		print teacher, "T"
 		academic_year = AcademicYear.objects.filter(start=year)[0]
+		print academic_year, "AY"
 	except IndexError:
 		print "Exception"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 
 	groups = Group.objects.filter(teacher=teacher,academic_year=academic_year)
 	groups = map(str,groups)
+	print groups, "G"
 	return HttpResponse(simplejson.dumps(groups), content_type="application/json")
 	
 ### Checks added. Looks fine ###
@@ -744,7 +752,10 @@ def update_time_graph(request):
 				explanation=Explanation.objects.filter(step=step)
 				if len(explanation)>0:
 					explanation=explanation[0]
-					explanation_text=explanation.text
+					if explanation.text == "No explanation":
+						explanation_text = "Click to see answers"
+					else:
+						explanation_text = explanation.text
 					if len(explanation_text)<100:
 						explanation_text_start=explanation_text[:len(explanation_text)]
 					else:
@@ -838,11 +849,14 @@ def populate_summary_table(request):
 		student_id=student.student_id
 
 		student_records=UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=group,student=student)
-		last_step_reached=student_records.aggregate(last_step=Max('step'))
+		print student_records
+		last_step_reached=student_records.aggregate(last_step=Max('step_number'))
+		print last_step_reached, "Last step0"
 		if last_step_reached['last_step'] == None:
 			last_step_reached = 0
 		else:
 			last_step_reached = last_step_reached['last_step']
+			print last_step_reached, "Last step"
 
 		total_app_time=student_records.aggregate(time_on_step=Sum('time_on_step'))
 		if total_app_time['time_on_step'] == None:

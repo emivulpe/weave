@@ -340,7 +340,7 @@ If you have any further questions regarding this experiment, please contact:
 Emilia Vulpe
 1106723v@student.gla.ac.uk </p>
 <p>
-This study adheres to the BPS ethical guidelines, and has been approved by the FIMS ethics committee of The University of Glasgow (ref: FIMS0050). Whilst you are free to discuss your participation in this study with the researcher (contactable on 330 4484), if you would like to speak to someone not involved in the study, you may contact the chair of the FIMS Ethics Committee (http://ethics.ims.gla.ac.uk/).</p>
+This study adheres to the BPS ethical guidelines.</p>
 
 </div>
 </div>
@@ -374,26 +374,29 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 			console.log("request....");
 			request.done(function(groups) { // Extract a list of the relevant groups
 				if ("error" in groups){
-					alert("Bad input groups" + groups["error"]);
+					console.log("not good");
 				}
-
 				else{
+					console.log("here");
 					if(year_element=="year"){
 						$(".existing_groups_list").empty();
-					}
-					for (var group_index in groups){
-						var group = groups[group_index];
-						var option="<option value='" + group+"' >"+group + "</option>";
-						console.log(group);
-						$("#"+group_element).append(option);
-						if(group_element=="group_entry"){
-							$(".existing_groups_list").append("<span class='appended_groups'>" + group + " </span>");
-						}
 					}
 					if (groups.length==0){
 						$(".existing_groups_list").append("<span class='appended_groups'>None</span>");
 					}
+					else{
+						for (var group_index in groups){
+							var group = groups[group_index];
+							var option="<option value='" + group+"' >"+group + "</option>";
+							console.log(group);
+							$("#"+group_element).append(option);
+							if(group_element=="group_entry"){
+								$(".existing_groups_list").append("<span class='appended_groups'>" + group + " </span>");
+							}
+						}
+					}
 				}
+
 			});
 			
 		};
@@ -539,7 +542,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 				$("#success_message").before("<i class='fa fa-check success_icon' style='color:green'></i>");
 				$("#success_message").text(" Your changes to group " + chosenGroup + " have been saved!");
 				$("#success_message").css("color","green");
-				$("#group").append("<option value='"+chosenGroup+"' >Group "+ chosenGroup + "</option>");
+				//$("#group").append("<option value='"+chosenGroup+"' >Group "+ chosenGroup + "</option>");
 			}
 			else{
 				$("#success_message").before("<i class='fa fa-times success_icon' style='color:red'></i>");

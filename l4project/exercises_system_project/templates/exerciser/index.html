@@ -125,7 +125,7 @@
 				</form>
 				<br>			
 
-				<strong id="success_message"></strong>
+				<strong id="success_message" style = "color:red"></strong>
 				{% endif %}
 			</div>
 				
@@ -355,7 +355,8 @@ function goToTutorialStep(tutorialStep){
 			chooseTeacherStep();
 		}
 		function saveStudent(){
-
+			$("#success_message").text('');
+			$("#back_button").hide();
 			var student = $("#student").val();
 			console.log("in student save ");
 			var request = $.post("/weave/register_student_with_session/",
@@ -374,7 +375,7 @@ function goToTutorialStep(tutorialStep){
 				
 				else{
 
-					$("#success_message").text("Sorry, but the student ID " + student + " is invalid. Please, try again, or click <No student ID> button to continue!!");
+					$("#success_message").text("Sorry, but the student ID " + student + " is invalid.Please try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No student ID>.");
 				}
 			});
 		};

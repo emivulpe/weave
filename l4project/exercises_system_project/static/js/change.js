@@ -264,7 +264,7 @@ $(document).ready(function ()
 });
 
 function ShowDialog(){
-	//$("#overlay").show();
+	$("#overlay").show();
 		$("#dialog").css({
 		"position": "absolute",
 		"top": ((($(window).height() - $("#dialog").outerHeight()) / 2) + $(window).scrollTop() + "px"),
@@ -272,7 +272,7 @@ function ShowDialog(){
 		});
 	$("#dialog").fadeIn(300);
 	
-	//$("#overlay").unbind("click");
+	$("#overlay").unbind("click");
 }
 
 function HideDialog(){

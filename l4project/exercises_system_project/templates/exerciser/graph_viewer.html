@@ -76,7 +76,7 @@
 		<caption id="summary_data_caption" style="text-align: center;margin:auto;">test</caption>
 		<tr>
 			<th>Student ID</th>
-			<th>Total time</th>
+			<th>Total time (s)</th>
 			<th>Times revisited</th>
 			<th>Last step</th>
 		</tr>
@@ -101,6 +101,8 @@
 
 	<script>
 
+	hs.zIndexCounter = 1000000;
+	
 		// extract some relevant information from the context
 		{% autoescape off %}
 		// ASK
@@ -159,7 +161,7 @@ function getStepData(step){
 				url='/weave/update_class_steps_graph/';
 				console.log("STEPPPPPPPPPPPPPP " + step);
 				var selectedItems={application:selectedApplication,group:selectedGroup,year:selectedYear,step:step};
-				var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:"Time","chartType":"column",selectedOption:"class_steps",chartSubtitle:""}
+				var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:"Time","chartType":"column",selectedOption:"class_steps","chartSubtitle":"Step " + step}
 				drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 			};
 			
@@ -172,7 +174,7 @@ function getStepData(step){
 				url='/weave/update_class_steps_graph/';
 				console.log("STEPPPPPPPPPPPPPP " + step);
 				var selectedItems={application:selectedApplication,group:selectedGroup,year:selectedYear,step:step};
-				var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:"Time","chartType":"column",selectedOption:"class_steps",chartSubtitle:""}
+				var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:"Time","chartType":"column",selectedOption:"class_steps","chartSubtitle":"Step " + step}
 				drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 			};
 			
@@ -311,7 +313,8 @@ function getStepData(step){
 
 				console.log("TREWTERTEgreagra " + url + selectedOption);
 				chartType=chartDetails["chartType"];
-				var chartSubtitle=chartDetails["chartSubtitle"];
+				chartSubtitle=chartDetails["chartSubtitle"];
+				
 				var xAxisTitle=chartDetails[xAxisTitle];
 				var yAxisTitle=chartDetails[yAxisTitle];
 				var seriesName=chartDetails[seriesName];
@@ -346,7 +349,9 @@ function getStepData(step){
 							}
 							else if(selectedOption=="answers" || selectedOption=="class_steps"){
 								sel_data=selected_data["data"]; // Get the data
-								chartSubtitle=selected_data["question"]; // Get the question text
+								if(selectedOption=="answers" ){
+									chartSubtitle=selected_data["question"]; // Get the question text
+								}
 								
 //alert(chartSubtitle);
 								var option_categories=[]; // List for the categories
@@ -367,7 +372,9 @@ function getStepData(step){
 								categories=option_categories;
 								
 							}
+							console.log(chartSubtitle + "CHART SUBTITLEEEEEEEEE");
 						drawChart(chartContainer,selectedOption,chartType,selectedApplication,selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,seriesFormat,chartClickHandler,questionSteps, seriesName,sel_data,tooltipFormat,selectedYear);
+						console.log(chartSubtitle + "CHART SUBTITLEEEEEEEEE");
 							//}
 						}
 						else{
@@ -379,6 +386,8 @@ function getStepData(step){
 			}
 
 			function drawChart(chartContainer,selectedOption,chartType, selectedApplication, selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,formatter1Funct,clickFunct,clickFunctParameter,seriesName,chartData,formatter2Funct,selectedYear){
+				
+				console.log(chartSubtitle + "CHART SUBTITLEEEEEEEEE");
 				$('#'+chartContainer).highcharts({
 					chart: {
 						type: chartType
@@ -448,7 +457,7 @@ function getStepData(step){
 							selectedItems["student"]=selectedStudent;
 						}
 						var chartOption="answers";
-						var chartDetails={xAxisTitle:"Choices",yAxisTitle:"Times chosen",seriesName:"Times chosen","chartType":"column",selectedOption:chartOption,chartSubtitle:""};
+						var chartDetails={xAxisTitle:"Choices",yAxisTitle:"Times chosen",seriesName:"Times chosen","chartType":"column",selectedOption:chartOption,"chartSubtitle":""};
 						var url = '/weave/get_question_data/';
 						drawChartMerged(selectedItems,chartDetails,chartOption,url,"cont_"+chart_num);
 						chart_num++;
@@ -488,7 +497,7 @@ function getStepData(step){
 					$("#summary_data").hide();
 					if (selectedOption=="time"){
 						var selectedItems={app_name:selectedApplication, group:selectedGroup, year:selectedYear};
-						var chartDetails={"chartType":"line",chartSubtitle:"",
+						var chartDetails={"chartType":"line","chartSubtitle":"",
 xAxisTitle:"Steps",yAxisTitle:"Seconds",seriesName:"Average time"};
 						var url='/weave/update_time_graph/';
 						drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
@@ -496,7 +505,7 @@ xAxisTitle:"Steps",yAxisTitle:"Seconds",seriesName:"Average time"};
 					else if (selectedOption=="answers"){
 						question=document.getElementById("question_list").value;
 						var selectedItems={app_name:selectedApplication, group:selectedGroup,year:selectedYear,question:question};
-						var chartDetails={xAxisTitle:"Choices",yAxisTitle:"Times chosen",seriesName:"Times chosen","chartType":"column",selectedOption:"answers",chartSubtitle:""};
+						var chartDetails={xAxisTitle:"Choices",yAxisTitle:"Times chosen",seriesName:"Times chosen","chartType":"column",selectedOption:"answers","chartSubtitle":""};
 						var url = '/weave/get_question_data/';
 						drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 					}
@@ -507,7 +516,7 @@ xAxisTitle:"Steps",yAxisTitle:"Seconds",seriesName:"Average time"};
 						step = parseInt(document.getElementById("step_list").value);
 						console.log("STEPPPPPPPPPPPPPP " + step);
 						var selectedItems={application:selectedApplication,group:selectedGroup,year:selectedYear,step:step};
-						var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:"Time","chartType":"column",selectedOption:"class_steps",chartSubtitle:""}
+						var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:"Time","chartType":"column",selectedOption:"class_steps","chartSubtitle":"Step " + step}
 						drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 					}
 					
@@ -516,7 +525,7 @@ xAxisTitle:"Steps",yAxisTitle:"Seconds",seriesName:"Average time"};
 						selectedStudent = document.getElementById("student_list").value; 
 						console.log(selectedStudent);
 						var selectedItems={app_name:selectedApplication, group:selectedGroup, year:selectedYear, student:selectedStudent};
-						var chartDetails={"chartType":"line",chartSubtitle:"",
+						var chartDetails={"chartType":"line","chartSubtitle":"",
 xAxisTitle:"Steps",yAxisTitle:"Seconds",seriesName:"Average time"};
 						var url='/weave/update_time_graph/';
 						drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");

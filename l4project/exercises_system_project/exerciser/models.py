@@ -229,7 +229,7 @@ class UsageRecord(models.Model):
 	session_id = models.CharField(max_length=100)
 	time_on_step = models.FloatField(default=0)
 	direction = models.CharField(max_length=10)
-
+	step_number = models.IntegerField()
 	
 	def __unicode__(self):
 		if self.teacher != None:
@@ -244,7 +244,12 @@ class UsageRecord(models.Model):
 			student=self.student.student_id
 		else:
 			student="No student id"
-		return " ".join((self.application.name ," teacher: ",teacher," group: ",group," student: ",student))
+		return " ".join((self.application.name ," teacher: ",teacher," group: ",group," student: ",student, "step", str(self.step.order)))
+		
+
+	def save(self, *args, **kwargs):	
+		self.step_number = self.step.order
+		super(UsageRecord, self).save(*args, **kwargs)
 
 """
 class QuestionRecord1(models.Model):

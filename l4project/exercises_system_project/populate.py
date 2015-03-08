@@ -15,6 +15,7 @@ def populate(filepath):
 		doc_id = docAttrDict['ID']
 		doc = add_document(doc_id,docAttrDict)
 		if doc is not None:
+			print "OK"
 			for fragment in document:
 				fragAttrDict = fragment.attrib
 				add_fragment(doc,fragAttrDict)
@@ -48,14 +49,16 @@ def add_fragment(doc, attributesDict):
 		id = attributesDict['ID']
 		text = attributesDict['value']
 		text = text.replace(' ','&nbsp')
+		text = text.replace('<','&lt')
+		text = text.replace('>','&gt')
 		if text.endswith(';'):
 			text = text[:text.rfind(";"):] + "<br/>"
 
 		order = json.loads(attributesDict['order'])
-
 		f = Fragment.objects.get_or_create(document = doc,id = id, text = text, style = fragment_style, type = fragment_type, order = order)[0]
 
 	except (IntegrityError, IndexError, KeyError):
+		print "exception"
 		pass
 
 # Start execution here!

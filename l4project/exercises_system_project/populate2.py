@@ -47,4 +47,5 @@ if __name__ == '__main__':
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exercises_system_project.settings')
 	from exerciser.models import Document, Application, Panel
 	from django.db import IntegrityError
+	from django.core.exceptions import ObjectDoesNotExist
 	populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects_new\Applications.xml")
