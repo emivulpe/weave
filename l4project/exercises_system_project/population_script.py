@@ -70,45 +70,6 @@ def str_to_bool(s):
 ##############################################################################################
 
 
-############################### Code to populate the applications ############################
-
-def populate_applications(filepath):
-
-	file = open(filepath,'r')
-	tree = ET.parse(file)
-	root = tree.getroot()
-	for application in root:
-		add_application(application)
-
-
-def add_application(app):
-	try:
-		applicationAttributesDict = app.attrib
-		name = applicationAttributesDict['name']
-		layout = applicationAttributesDict['layout']
-		application = Application.objects.get_or_create(name = name)[0]
-		application.layout = layout
-		application.save()
-		for panel in app.iter('panel'):
-			panelAttributesDict = panel.attrib
-			add_panel(application,panelAttributesDict)
-	except (IntegrityError, KeyError):
-		pass
-	
-def add_panel(application, attributesDict):
-	try:
-		number = json.loads(attributesDict['number'])
-		type = attributesDict['type']
-		documentName = attributesDict['content']
-		document = Document.objects.filter(name = documentName)
-		if len(document) > 0:
-			document = document[0]
-			p = Panel.objects.get_or_create(application = application, number = number, type = type, document = document)[0]
-	except (IntegrityError, ObjectDoesNotExist, KeyError):
-		pass
-
-##############################################################################################
-
 
 ################################### Code to populate the documents ###########################
 
@@ -165,6 +126,44 @@ def add_fragment(doc, attributesDict):
 
 ##############################################################################################
 
+############################### Code to populate the applications ############################
+
+def populate_applications(filepath):
+
+	file = open(filepath,'r')
+	tree = ET.parse(file)
+	root = tree.getroot()
+	for application in root:
+		add_application(application)
+
+
+def add_application(app):
+	try:
+		applicationAttributesDict = app.attrib
+		name = applicationAttributesDict['name']
+		layout = applicationAttributesDict['layout']
+		application = Application.objects.get_or_create(name = name)[0]
+		application.layout = layout
+		application.save()
+		for panel in app.iter('panel'):
+			panelAttributesDict = panel.attrib
+			add_panel(application,panelAttributesDict)
+	except (IntegrityError, KeyError):
+		pass
+	
+def add_panel(application, attributesDict):
+	try:
+		number = json.loads(attributesDict['number'])
+		type = attributesDict['type']
+		documentName = attributesDict['content']
+		document = Document.objects.filter(name = documentName)
+		if len(document) > 0:
+			document = document[0]
+			p = Panel.objects.get_or_create(application = application, number = number, type = type, document = document)[0]
+	except (IntegrityError, ObjectDoesNotExist, KeyError):
+		pass
+
+##############################################################################################
 
 ################################### Code to populate the processes ###########################
 
@@ -251,7 +250,7 @@ def add_explanation(step, element):
 if __name__ == '__main__':
 	print "Starting DocumentFragment population script..."
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exercises_system_project.settings')
-	from exerciser.models import FragmentStyle, Document, DocumentType, FragmentType, Fragment, Step, Change, Question, Explanation, Option, Application, Panel
+	from exerciser.models import FragmentStyle, Document, DocumentType, FragmentType, Fragment, Step, Change, Question, Explanation, Option, Application, Panel, AcademicYear
 	from django.db import IntegrityError
 	from django.core.exceptions import ObjectDoesNotExist
 	
@@ -259,15 +258,18 @@ if __name__ == '__main__':
 	doc_types_path = os.path.join(os.path.dirname(__file__), 'cs1ct/Doc Types.xml')
 	populate_doc_types(doc_types_path)
 	
+	# Specify the file containing Documents
+	documents_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Documents.xml')
+	populate_documents(documents_path)
+
 	# Specify the file containing Applications
 	applications_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Applications.xml')
 	populate_applications(applications_path)
 	
-	# Specify the file containing Documents
-	documents_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Documents.xml')
-	populate_documents(documents_path)
 	
 	# Specify the file containing Processes
 	processes_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Processes.xml')
 	populate_processes(processes_path)
 	
+	#Add an academic year
+	academic_year = AcademicYear.objects.get_or_create(start = 2014)[0]

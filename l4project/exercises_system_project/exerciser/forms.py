@@ -2,6 +2,7 @@ from exerciser.models import Teacher, SampleQuestionnaire
 from django.contrib.auth.models import User
 from django import forms
 
+# A form to create a user profile
 class UserForm(forms.ModelForm):
 	username = forms.CharField()
 	password = forms.CharField(widget=forms.PasswordInput())
@@ -9,8 +10,6 @@ class UserForm(forms.ModelForm):
 	username.label = "Username:"
 	password.label = "Password:"
 	password2.label = "Confirm password:"
-	
-	print dir(password2)
 
 	class Meta:
 		model = User
@@ -21,6 +20,8 @@ class UserForm(forms.ModelForm):
 
 		for fieldname in ['username']:
 			self.fields[fieldname].help_text = None
+
+	# Make sure the passwords are the same
 	def clean(self):
 		password1 = self.cleaned_data.get('password')
 		password2 = self.cleaned_data.get('password2')
@@ -29,12 +30,7 @@ class UserForm(forms.ModelForm):
 			raise forms.ValidationError("Passwords don't match")
 
 		return self.cleaned_data
-"""		
-class GroupForm(forms.ModelForm):
-    class Meta:
-        model = Teacher
-        
-"""
+
 		
 class SampleQuestionnaireForm(forms.ModelForm):
 	"""

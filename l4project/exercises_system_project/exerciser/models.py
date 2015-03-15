@@ -2,25 +2,35 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-
+# A class for applications
 class Application(models.Model):
 	name = models.CharField(max_length = 128, primary_key = True)
 	layout = models.CharField(max_length = 128)
 
+	# Show it via application name
 	def __unicode__(self):
 		return self.name
-		
+
+# A class for document types
 class DocumentType(models.Model):
 	name = models.CharField(max_length=128,unique=True,primary_key=True)
 	kind = models.CharField(max_length=128)
+	
+	# Show it via document type name
+	def __unicode__(self):
+		return self.name
 
+# A class for fragment types
 class FragmentType(models.Model):
 	name = models.CharField(max_length=128)
 	kind = models.CharField(max_length=128)
-	#style = models.ForeignKey(FragmentStyle, blank=True, null=True)
 	document_type = models.ForeignKey(DocumentType, blank=True, null=True)
 	
+	# Show it via fragment type name
+	def __unicode__(self):
+		return self.name
 
+# A class for fragment styles
 class FragmentStyle(models.Model):
 	font = models.CharField(max_length=50)
 	bold = models.BooleanField(default=False)
@@ -28,6 +38,8 @@ class FragmentStyle(models.Model):
 	underlined = models.BooleanField(default=False)
 	font_size = models.SmallIntegerField()
 	type = models.ForeignKey(FragmentType, blank=True, null=True)
+	
+	# Prepare the fragment style in the form of css attributes
 	def __unicode__(self):
 		style=""
 		if self.font != None:
@@ -42,20 +54,18 @@ class FragmentStyle(models.Model):
 			style += "font-size:" + str(self.font_size) + "px;"
 		return style
 		
-
+# A class for documents
 class Document(models.Model):
 	id = models.CharField(max_length=128,unique=True,primary_key=True)
 	document_type = models.ForeignKey(DocumentType, blank=True, null=True)
 	name = models.CharField(max_length=128)
-#	type = models.ForeignKey(DocumentType, blank=True, null=True)
 	fixOrder = models.BooleanField()
 
+	# Show if via the document name
 	def __unicode__(self):
 		return self.name
 
-		
-		
-
+# A class for fragments
 class Fragment(models.Model):
 	id = models.CharField(max_length=128,unique=True,primary_key=True)
 	document = models.ForeignKey(Document, blank=True, null=True)
@@ -64,9 +74,11 @@ class Fragment(models.Model):
 	type = models.ForeignKey(FragmentType, blank=True, null=True)
 	order = models.IntegerField()
 
+	# Show it via the text for the fragment
 	def __unicode__(self):
-		return " ".join((self.text))
-		
+		return self.text
+	
+	"""	
 	def __init__(self, *args, **kwargs):
 		super(Fragment, self).__init__(*args, **kwargs)
 		self.visible = False
@@ -75,7 +87,8 @@ class Fragment(models.Model):
 	def reset(self):
 		self.visible = False
 		self.highlighted = False
-
+	"""
+"""
 class UserProfile(models.Model):
 	user = models.OneToOneField(User)
 	type = models.CharField(max_length=128)
@@ -83,7 +96,7 @@ class UserProfile(models.Model):
 	# Override the __unicode__() method to return out something meaningful!
 	def __unicode__(self):
 		return self.user.username
-
+"""
 
 class Step(models.Model):
 	application = models.ForeignKey(Application)
