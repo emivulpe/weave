@@ -159,7 +159,7 @@
 });
 
 $('#btn_next_step').click(function() {
-	if (tutorialStep < 9){
+	if (tutorialStep < 10){
 		tutorialStep++;
 		console.log("next clicked");
 		goToTutorialStep(tutorialStep);
@@ -178,43 +178,49 @@ function goToTutorialStep(tutorialStep){
 			break;
 		case 1:
 			$("#prev_step").css("display","inline");
+			$("#tutorial_screenshot").hide();
+			$("#tutorial_text").text("Get the window to the size you want it before starting to look at any worked examples, and don’t resize the window after that.");
+			break;
+		case 2:
+			$("#prev_step").css("display","inline");
 			$("#tutorial_screenshot").show();
 			$("#tutorial_text").text("To start using Weave, enter any details given by your teacher and press the respective button. If none given click on No teacher ID, etc.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/specify details.jpg' %}");
+			
 			break;
-		case 2:
+		case 3:
 			$("#prev_step").css("display","inline");
 			$("#tutorial_screenshot").show();
 			$("#tutorial_text").text("You can reset your details by clicking on Reset Details button on the top right corner of the page.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/reset details.jpg' %}");
 			break;
-		case 3:
+		case 4:
 			$("#tutorial_text").text("An application selector will appear both on the toolbar next to the Home icon, and on the left of this tutorial. You can search for an example by typing in the text box.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/select application.jpg' %}");
 			break;
-		case 4:
+		case 5:
 			$("#tutorial_text").text("Start by clicking on the Start button on the top right of the page. ");
 			$("#tutorial_screenshot").attr("src","{% static 'media/start.jpg' %}");
 			break;
-		case 5:
-			$("#tutorial_text").text("You can go back and forward through the steps, as well as reset the example by the buttons on the top right of the page.");
+		case 6:
+			$("#tutorial_text").text("You can go back and forward through the steps, as well as reset the example by the buttons on the top right of the page. Alternatively, use the arrow buttons to navigate through the worked example.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/controls.jpg' %}");
 			break;
-		case 6:
+		case 7:
 			$("#tutorial_text").text("Note the explanation panel.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/explanation.jpg' %}");
 			break;
-		case 7:
+		case 8:
 			$("#tutorial_text").text("You can resize the panels left to right, top to bottom.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/resize.jpg' %}");
 			break;
-		case 8:
+		case 9:
 			$("#tutorial_text").text("Questions may appear to check your knowledge.");
 			$("#tutorial_screenshot").attr("src","{% static 'media/question.jpg' %}");
 			$("#next_step").css("display","inline");
 			$("#tutorial_screenshot").show();
 			break;
-		case 9:
+		case 10:
 			$("#tutorial_text").text("Enjoy!");
 			$("#tutorial_screenshot").hide();
 			$("#next_step").css("display","none");

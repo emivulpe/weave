@@ -57,9 +57,9 @@ class Document(models.Model):
 		
 
 class Fragment(models.Model):
-	document = models.ForeignKey(Document)
-	style = models.ForeignKey(FragmentStyle, blank=True, null=True)
 	id = models.CharField(max_length=128,unique=True,primary_key=True)
+	document = models.ForeignKey(Document, blank=True, null=True)
+	style = models.ForeignKey(FragmentStyle, blank=True, null=True)
 	text = models.TextField()
 	type = models.ForeignKey(FragmentType, blank=True, null=True)
 	order = models.IntegerField()

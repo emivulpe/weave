@@ -67,4 +67,5 @@ if __name__ == '__main__':
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exercises_system_project.settings')
 	from exerciser.models import Document, Fragment, FragmentType, DocumentType, FragmentStyle
 	from django.db import IntegrityError
-	populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects_new\Documents.xml")
+	fn = os.path.join(os.path.dirname(__file__), 'cs1ct/Documents.xml')
+	populate(fn)

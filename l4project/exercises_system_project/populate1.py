@@ -110,4 +110,5 @@ if __name__ == '__main__':
 	from exerciser.models import Step, Change, Question, Explanation, Option, Fragment, Document, Application
 	from django.db import IntegrityError
 	from django.core.exceptions import ObjectDoesNotExist
-	populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects_new\Processes.xml")
+	fn = os.path.join(os.path.dirname(__file__), 'cs1ct/Processes.xml')
+	populate(fn)

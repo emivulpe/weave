@@ -86,4 +86,5 @@ if __name__ == '__main__':
 	#	print "Please specify the path for the file Doc Types.xml"
 	#else:
 	#print 'Argument List:', str(sys.argv)
-	populate("C:\Users\Emi\Desktop\lvl4project\project\Current IWE\Resources\projects\cs1ct\Doc Types.xml")
+	fn = os.path.join(os.path.dirname(__file__), 'cs1ct/Doc Types.xml')
+	populate(fn)
