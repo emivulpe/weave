@@ -2,7 +2,8 @@ from django.test import TestCase, Client
 from exerciser.models import Application, User, Teacher, Step, Group, AcademicYear, Student
 from django.utils import timezone
 from django.core.urlresolvers import reverse
-
+from django.conf import settings
+from django.utils.importlib import import_module
 
 #imports for views
 from django.core.urlresolvers import reverse
@@ -46,16 +47,43 @@ class LogInfoDbTests(TestCase):
 
 	def test_log_info_db_valid(self):
 		c = Client()
-		"""
-		c.login(username='test user',password='password)
+		c.login(username='test user',password='password')
 		engine = import_module(settings.SESSION_ENGINE)
 		store = engine.SessionStore()
 		store.save()  # we need to make load() work, or the cookie isworthless
 		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 		session = c.session
-		session.update({'time': 20, 'step':1,'direction':'next',example_name:'test app'})
+		session.update({'teacher': 'test user'})
 		session.save()
-		"""
-		
+
 		response = c.post(reverse('log_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app'})
+		self.assertEqual(response.status_code, 200)
+
+	def test_log_info_db_invalid_data(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  # we need to make load() work, or the cookie isworthless
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+
+		response = c.post(reverse('log_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'invalid app'})
+		self.assertEqual(response.status_code, 200)
+
+		
+	def test_log_info_db_invalid_key(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  # we need to make load() work, or the cookie isworthless
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+
+		response = c.post(reverse('log_info_db'), {'invalid key': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app'})
 		self.assertEqual(response.status_code, 200)
