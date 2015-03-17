@@ -55,4 +55,4 @@ docs/_build/
 target/
 
 #Database
-./l4project/exercises_system_project/exerciser.db
+#./l4project/exercises_system_project/exerciser.db
