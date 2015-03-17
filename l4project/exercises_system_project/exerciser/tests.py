@@ -41,6 +41,9 @@ class LogInfoDbTests(TestCase):
 			teacher = Teacher.objects.get_or_create(user = user)[0]
 			app = Application.objects.get_or_create(name = 'test app')[0]
 			step = Step.objects.get_or_create(application = app, order = 1)[0]
+			year = AcademicYear.objects.get_or_create(start = 2014)[0]
+			group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+			student = Student.objects.get_or_create(teacher=teacher,group=group,student_id = 'test student')[0]
 		
 
 
@@ -53,7 +56,7 @@ class LogInfoDbTests(TestCase):
 		store.save()  # we need to make load() work, or the cookie isworthless
 		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 		session = c.session
-		session.update({'teacher': 'test user'})
+		session.update({'teacher': 'test user', 'year':2014, 'group':'test group', 'student': 'test student'})
 		session.save()
 
 		response = c.post(reverse('log_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app'})
@@ -67,7 +70,7 @@ class LogInfoDbTests(TestCase):
 		store.save()  # we need to make load() work, or the cookie isworthless
 		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 		session = c.session
-		session.update({'teacher': 'test user'})
+		session.update({'teacher': 'test user', 'group' : 'test group', 'year':2014})
 		session.save()
 
 		response = c.post(reverse('log_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'invalid app'})
