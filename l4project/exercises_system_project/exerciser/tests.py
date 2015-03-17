@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from exerciser.models import Application, User, Teacher, Step, Group, AcademicYear, Student
+from exerciser.models import Application, User, Teacher, Step, Group, AcademicYear, Student, Question, Option
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -33,17 +33,17 @@ class IndexViewTests(TestCase):
 		
 class LogInfoDbTests(TestCase):
 	def setUp(self):
-			# Setup Test User
-			user = User.objects.create_user(
-				username='test user',
-				password='password'
-			)
-			teacher = Teacher.objects.get_or_create(user = user)[0]
-			app = Application.objects.get_or_create(name = 'test app')[0]
-			step = Step.objects.get_or_create(application = app, order = 1)[0]
-			year = AcademicYear.objects.get_or_create(start = 2014)[0]
-			group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
-			student = Student.objects.get_or_create(teacher=teacher,group=group,student_id = 'test student')[0]
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		app = Application.objects.get_or_create(name = 'test app')[0]
+		step = Step.objects.get_or_create(application = app, order = 1)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		student = Student.objects.get_or_create(teacher=teacher,group=group,student_id = 'test student')[0]
 		
 
 
@@ -73,7 +73,7 @@ class LogInfoDbTests(TestCase):
 		session.update({'teacher': 'test user', 'group' : 'test group', 'year':2014})
 		session.save()
 
-		response = c.post(reverse('log_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'invalid app'})
+		response = c.post(reverse('log_info_db'), {'time': 20, 'step': 1, 'direction' : 'back', 'example_name':'invalid app'})
 		self.assertEqual(response.status_code, 200)
 
 		
@@ -89,4 +89,77 @@ class LogInfoDbTests(TestCase):
 		session.save()
 
 		response = c.post(reverse('log_info_db'), {'invalid key': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app'})
+		self.assertEqual(response.status_code, 200)
+		
+		
+class LogQuestionInfoDbTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		app = Application.objects.get_or_create(name = 'test app')[0]
+		step = Step.objects.get_or_create(application = app, order = 1)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		student = Student.objects.get_or_create(teacher=teacher,group=group,student_id = 'test student')[0]
+		question = Question.objects.get_or_create(application = app, step = step, question_text = 'test question')[0]
+		option = Option.objects.get_or_create(question = question, number = 1, content = 'test option')[0]
+
+	def test_log_question_info_db_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  # we need to make load() work, or the cookie isworthless
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year':2014, 'group':'test group', 'student': 'test student'})
+		session.save()
+
+		response = c.post(reverse('log_question_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app','answer':'test option','multiple_choice':'true'})
+		self.assertEqual(response.status_code, 200)
+
+	def test_log_question_info_db_invalid_data(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  # we need to make load() work, or the cookie isworthless
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'group' : 'test group', 'year':2014})
+		session.save()
+
+		response = c.post(reverse('log_question_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'invalid app','answer':'test option','multiple_choice':'true'})
+		self.assertEqual(response.status_code, 200)
+		
+	def test_log_question_info_db_invalid_data(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  # we need to make load() work, or the cookie isworthless
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'group' : 'test group', 'year':2014})
+		session.save()
+
+		response = c.post(reverse('log_question_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app','answer':'invalid option','multiple_choice':'true'})
+		self.assertEqual(response.status_code, 200)
+		
+	def test_log_question_info_db_invalid_key(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  # we need to make load() work, or the cookie isworthless
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+
+		response = c.post(reverse('log_question_info_db'), {'invalid key': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app','answer':'test option','multiple_choice':'true'})
 		self.assertEqual(response.status_code, 200)
