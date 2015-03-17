@@ -349,7 +349,7 @@ class RegisterTeacherWithSessionTests(TestCase):
 		)
 		teacher = Teacher.objects.get_or_create(user = user)[0]
 
-		
+
 
 	def test_register_teacher_with_session_valid(self):
 		c = Client()
@@ -365,4 +365,56 @@ class RegisterTeacherWithSessionTests(TestCase):
 	def test_register_teacher_with_session_invalid_key(self):
 		c = Client()
 		response = c.post(reverse('register_teacher_with_session'), {'invalid key' : 'test user'})
+		self.assertEqual(response.status_code, 200)
+		
+class RegisterStudentWithSessionTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		student = Student.objects.get_or_create(teacher = teacher, group = group, student_id = 'test student')[0]
+
+	def test_register_student_with_session_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year':2014,'group':'test group'})
+		session.save()
+		response = c.post(reverse('register_student_with_session'), {'student' : 'test student'})
+		self.assertEqual(response.status_code, 200)
+
+	def test_register_student_with_session_invalid_data(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year':2014,'group':'test group'})
+		session.save()
+		response = c.post(reverse('register_student_with_session'), {'student' : 'invalid student'})
+		self.assertEqual(response.status_code, 200)
+		
+
+	def test_register_student_with_session_invalid_key(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test teacher','year':2014,'group':'test group'})
+		session.save()
+		response = c.post(reverse('register_student_with_session'), {'invalid key' : 'test student'})
 		self.assertEqual(response.status_code, 200)
