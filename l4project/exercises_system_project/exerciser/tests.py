@@ -332,3 +332,9 @@ class RegisterGroupWithSessionTests(TestCase):
 		session.save()
 		response = c.post(reverse('register_group_with_session'), {'invalid key' : 'test group'})
 		self.assertEqual(response.status_code, 200)
+		
+class SaveSessionIdsTests(TestCase):
+	def test_save_session(self):
+		c = Client()
+		response = c.post(reverse('save_session_ids'), {})
+		self.assertEqual(response.status_code, 302)
