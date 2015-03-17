@@ -338,3 +338,31 @@ class SaveSessionIdsTests(TestCase):
 		c = Client()
 		response = c.post(reverse('save_session_ids'), {})
 		self.assertEqual(response.status_code, 302)
+		
+		
+class RegisterTeacherWithSessionTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+
+		
+
+	def test_register_teacher_with_session_valid(self):
+		c = Client()
+		response = c.post(reverse('register_teacher_with_session'), {'teacher' : 'test user'})
+		self.assertEqual(response.status_code, 200)
+
+	def test_register_teacher_with_session_invalid_data(self):
+		c = Client()
+		response = c.post(reverse('register_teacher_with_session'), {'teacher' : 'invalid teacher'})
+		self.assertEqual(response.status_code, 200)
+		
+
+	def test_register_teacher_with_session_invalid_key(self):
+		c = Client()
+		response = c.post(reverse('register_teacher_with_session'), {'invalid key' : 'test user'})
+		self.assertEqual(response.status_code, 200)
