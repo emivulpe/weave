@@ -192,3 +192,31 @@ class StudentGroupListTests(TestCase):
 		c = Client()
 		response = c.get(reverse('student_group_list'), {'invalid': 'test user', 'year':2014, 'group':'test group'})
 		self.assertEqual(response.status_code, 200)
+		
+class CreateGroupTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		
+
+	def test_create_group_valid(self):
+		c = Client()
+		response = c.post(reverse('create_group'), {'teacher': 'test user', 'year':2014, 'group':'new group','num_students':10})
+		self.assertEqual(response.status_code, 200)
+
+	def test_create_group_invalid_data(self):
+		c = Client()
+		response = c.post(reverse('create_group'), {'teacher': 'invalid user', 'year':2014, 'group':'test group','num_students':10})
+		self.assertEqual(response.status_code, 200)
+		
+
+	def test_create_group_invalid_key(self):
+		c = Client()
+		response = c.post(reverse('create_group'), {'invalid keys': 'test user', 'year':2014, 'group':'test group','num_students':10})
+		self.assertEqual(response.status_code, 200)
