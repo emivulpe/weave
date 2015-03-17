@@ -149,9 +149,9 @@ def add_application(app):
 	try:
 		applicationAttributesDict = app.attrib
 		name = applicationAttributesDict['name']
-		layout = applicationAttributesDict['layout']
+		#layout = applicationAttributesDict['layout']
 		application = Application.objects.get_or_create(name = name)[0]
-		application.layout = layout
+		#application.layout = layout
 		application.save()
 		for panel in app.iter('panel'):
 			panelAttributesDict = panel.attrib

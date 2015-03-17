@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # A class for applications
 class Application(models.Model):
 	name = models.CharField(max_length = 128, primary_key = True)
-	layout = models.CharField(max_length = 128)
+	#layout = models.CharField(max_length = 128)
 
 	# Show it via application name
 	def __unicode__(self):
@@ -36,14 +36,14 @@ class FragmentStyle(models.Model):
 	bold = models.BooleanField(default=False)
 	italic = models.BooleanField(default=False)
 	underlined = models.BooleanField(default=False)
-	font_size = models.SmallIntegerField()
+	font_size = models.SmallIntegerField(default=12)
 	type = models.ForeignKey(FragmentType, blank=True, null=True)
 	
 	# Prepare the fragment style in the form of css attributes
 	def __unicode__(self):
 		style=""
 		if self.font != None:
-			style += "font-family:"+self.font + ";"
+			style += "font-family: "+self.font + ";"
 		if self.bold != None and self.bold:
 			style += "font-weight: bold;"
 		if self.italic != None and self.italic:
@@ -51,7 +51,7 @@ class FragmentStyle(models.Model):
 		if self.underlined != None and self.underlined:
 			style += "text-decoration: underline;"
 		if self.font_size != None:
-			style += "font-size:" + str(self.font_size) + "px;"
+			style += "font-size: " + str(self.font_size) + "px;"
 		return style
 		
 # A class for documents
@@ -59,7 +59,7 @@ class Document(models.Model):
 	id = models.CharField(max_length=128,unique=True,primary_key=True)
 	document_type = models.ForeignKey(DocumentType, blank=True, null=True)
 	name = models.CharField(max_length=128)
-	fixOrder = models.BooleanField()
+	#fixOrder = models.BooleanField()
 
 	# Show if via the document name
 	def __unicode__(self):
@@ -78,25 +78,6 @@ class Fragment(models.Model):
 	def __unicode__(self):
 		return self.text
 	
-	"""	
-	def __init__(self, *args, **kwargs):
-		super(Fragment, self).__init__(*args, **kwargs)
-		self.visible = False
-		self.highlighted = False
-		
-	def reset(self):
-		self.visible = False
-		self.highlighted = False
-	"""
-"""
-class UserProfile(models.Model):
-	user = models.OneToOneField(User)
-	type = models.CharField(max_length=128)
-
-	# Override the __unicode__() method to return out something meaningful!
-	def __unicode__(self):
-		return self.user.username
-"""
 
 class Step(models.Model):
 	application = models.ForeignKey(Application)
@@ -167,7 +148,7 @@ class Option(models.Model):
 
 
 	def __unicode__(self):
-		return " ".join(("ID",str(self.id),"Option: ", str(self.number), ". ", self.content))
+		return "".join(("Option: ", str(self.number), ". ", self.content))
 
 		
 class Panel(models.Model):
@@ -204,7 +185,7 @@ class AcademicYear(models.Model):
 		
 class Teacher(models.Model):
 	user = models.OneToOneField(User)
-	can_analyse = models.BooleanField(default=False) ### TODO maybe make it int insted? ###
+	can_analyse = models.BooleanField(default=False)
 	
 	def __unicode__(self):
 		return " ".join((self.user.username ,str(self.can_analyse)))

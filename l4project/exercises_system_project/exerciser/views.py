@@ -53,18 +53,18 @@ def log_info_db(request):
 	print direction, "DIR"
 	if direction == "back":
 		current_step = int(current_step) + 1
-	#### TODO add some checks if these exist ####
+
 	try:
 		application = Application.objects.filter(name=application_name)[0]
 		step = Step.objects.filter(application=application, order = current_step)[0]
-		print step, "STEP TEST"
+
 	except IndexError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 		
 	record = UsageRecord(application = application, session_id = session_id, time_on_step = time_on_step, step = step, direction = direction)
 	
 	teacher_name=request.session.get("teacher",None)
-
+	print teacher_name
 	if teacher_name != None:
 	
 		user=User.objects.filter(username=teacher_name)
@@ -107,7 +107,10 @@ def log_question_info_db(request):
 	answer_text = request.POST['answer']
 	multiple_choice_question = request.POST['multiple_choice']
 	teacher_name=request.session.get("teacher",None)
-
+	print answer_text
+	
+	answer_text = answer_text.replace('<', '&lt')#
+	answer_text = answer_text.replace('>', '&gt')
 	application = Application.objects.filter(name=application_name)[0]
 	step = Step.objects.filter(application=application, order=current_step)[0]
 	question = Question.objects.filter(step=step)[0]

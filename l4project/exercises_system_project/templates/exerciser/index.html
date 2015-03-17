@@ -59,12 +59,15 @@
 						</tr>
 						<tr>
 						<td>
-
+						{% if applications %}
 						<ul class="navList" style=" list-style-type: none; ">
-						{% for application in applications %}
-						<li><a href="/weave/application/{{ application.url }}" style="color:gray;">{{ application.name }}</a></li>
-						{% endfor %}
+							{% for application in applications %}
+								<li><a href="/weave/application/{{ application.url }}" style="color:gray;">{{ application.name }}</a></li>
+							{% endfor %}
 						</ul>
+						{% else %}
+							<strong>There are no applications present!</strong>
+						{% endif %}
 						</td>
 						</tr>
 						</table>

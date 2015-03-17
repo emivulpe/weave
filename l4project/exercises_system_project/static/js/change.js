@@ -100,7 +100,7 @@ function goToStep(direction) {
 	
 		if (direction == "next" && explanation_dict[currentStep] == undefined) {
 			console.log("1");
-			var explanationText= answer +'<strong>Step '+ (currentStep + 1) +"/" + totalSteps + ':</strong><br/>';
+			var explanationText= escapeHtml(answer) +'<br><strong>Step '+ (currentStep + 1) +"/" + totalSteps + ':</strong><br/>';
 			if(action!="question"){
 				explanationText += explanations[currentStep].substring(1, explanations[currentStep].length-1);
 				answer = "";
@@ -256,7 +256,7 @@ $(document).ready(function ()
 				});
 			}
 			lastTime = now;
-			answer = " You answered: " + answer + "<br>";
+			answer = " You answered: " + answer;
 			goToStep("next");
 		}
 	});
@@ -311,3 +311,13 @@ document.onkeydown = function(e) {
             break;
     }
 };
+
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
