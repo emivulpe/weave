@@ -8,6 +8,8 @@ from django.utils.importlib import import_module
 #imports for views
 from django.core.urlresolvers import reverse
 
+
+"""
 # models test
 class ApplicationTest(TestCase):
 
@@ -219,4 +221,114 @@ class CreateGroupTests(TestCase):
 	def test_create_group_invalid_key(self):
 		c = Client()
 		response = c.post(reverse('create_group'), {'invalid keys': 'test user', 'year':2014, 'group':'test group','num_students':10})
+		self.assertEqual(response.status_code, 200)
+"""
+class DeleteGroupTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		
+
+	def test_delete_group_valid(self):
+		c = Client()
+		response = c.post(reverse('delete_group'), {'teacher': 'test user', 'year':2014, 'group':'test group'})
+		self.assertEqual(response.status_code, 200)
+
+	def test_delete_group_invalid_data(self):
+		c = Client()
+		response = c.post(reverse('delete_group'), {'teacher': 'invalid user', 'year':2014, 'group':'test group'})
+		self.assertEqual(response.status_code, 200)
+		
+
+	def test_delete_group_invalid_key(self):
+		c = Client()
+		response = c.post(reverse('delete_group'), {'invalid keys': 'test user', 'year':2014, 'group':'test group'})
+		self.assertEqual(response.status_code, 200)
+
+
+class UpdateGroupTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		
+
+	def test_update_group_valid(self):
+		c = Client()
+		response = c.post(reverse('update_group'), {'teacher': 'test user', 'year':2014, 'group':'test group','num_students':10})
+		self.assertEqual(response.status_code, 200)
+
+	def test_update_group_invalid_data(self):
+		c = Client()
+		response = c.post(reverse('update_group'), {'teacher': 'invalid user', 'year':2014, 'group':'test group','num_students':10})
+		self.assertEqual(response.status_code, 200)
+		
+
+	def test_update_group_invalid_key(self):
+		c = Client()
+		response = c.post(reverse('update_group'), {'invalid keys': 'test user', 'year':2014, 'group':'test group','num_students':10})
+		self.assertEqual(response.status_code, 200)
+		
+		
+class RegisterGroupWithSessionTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		
+
+	def test_register_group_with_session_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year':2014})
+		session.save()
+		response = c.post(reverse('register_group_with_session'), {'group' : 'test group'})
+		self.assertEqual(response.status_code, 200)
+
+	def test_register_group_with_session_invalid_data(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year':2014})
+		session.save()
+		response = c.post(reverse('register_group_with_session'), {'group' : 'invalid group'})
+		self.assertEqual(response.status_code, 200)
+		
+
+	def test_register_group_with_session_invalid_key(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year':2014})
+		session.save()
+		response = c.post(reverse('register_group_with_session'), {'invalid key' : 'test group'})
 		self.assertEqual(response.status_code, 200)
