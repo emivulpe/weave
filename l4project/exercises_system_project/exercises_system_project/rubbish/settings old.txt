@@ -7,9 +7,8 @@ PROJECT_PATH = os.path.abspath(PROJECT_PATH)
 TEMPLATE_PATH = os.path.join(PROJECT_PATH, 'templates')
 STATIC_PATH = os.path.join(PROJECT_PATH,'static')
 
-DEPLOYED = False
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = DEBUG 
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -75,10 +74,7 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-if DEPLOYED:
-    STATIC_URL = '/weave/static/'
-else:
-    STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -112,7 +108,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'exerciser.disable.DisableCSRF',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -140,11 +135,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'exerciser',
-	'chartit'
+    'exerciser'
 )
-
-LOGIN_URL = '/exerciser/login/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
@@ -153,12 +145,6 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-
-if DEPLOYED:
-    log_filename = '/var/www/DJANGO/weave/mysite/weave.log'
-else:
-    log_filename = 'C:\Users\Emi\mysite.log'
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -167,37 +153,18 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugFalse'
         }
     },
-	'formatters': {
-        'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': log_filename,
-            'formatter': 'verbose'
-        },
+        }
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
-        },
-        'exerciser': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
         },
     }
 }
@@ -211,5 +178,4 @@ TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
 	"django.core.context_processors.media",
 	"django.core.context_processors.static",
 	"django.contrib.messages.context_processors.messages",
-	"exerciser.context_processor.applications",
-	"django.core.context_processors.request")
+	"exerciser.context_processor.applications")

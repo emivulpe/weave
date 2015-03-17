@@ -99,26 +99,31 @@ def log_info_db(request):
 @requires_csrf_token
 def log_question_info_db(request):
 
-	time_on_question = request.POST['time']
-	
-	current_step = request.POST['step']
-	session_id = request.session.session_key
-	application_name = request.POST['example_name']
-	answer_text = request.POST['answer']
-	multiple_choice_question = request.POST['multiple_choice']
+	try:
+		time_on_question = request.POST['time']
+		current_step = request.POST['step']
+		application_name = request.POST['example_name']
+		answer_text = request.POST['answer']
+		multiple_choice_question = request.POST['multiple_choice']
+	except KeyError:
+		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_name=request.session.get("teacher",None)
-	print answer_text
-	
+	session_id = request.session.session_key
 	answer_text = answer_text.replace('<', '&lt')#
 	answer_text = answer_text.replace('>', '&gt')
-	application = Application.objects.filter(name=application_name)[0]
-	step = Step.objects.filter(application=application, order=current_step)[0]
-	question = Question.objects.filter(step=step)[0]
-	
+	try:
+		application = Application.objects.filter(name=application_name)[0]
+		step = Step.objects.filter(application=application, order=current_step)[0]
+		question = Question.objects.filter(step=step)[0]
+	except IndexError:
+		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	usage_record = UsageRecord(application = application, session_id = session_id, time_on_step = time_on_question, step = step, direction = "next")
 	question_record=QuestionRecord(application=application,question=question, answer_text=answer_text)
 	if multiple_choice_question=="true":
-		answer = Option.objects.filter(question=question,content=answer_text)[0]
+		try:
+			answer = Option.objects.filter(question=question,content=answer_text)[0]
+		except IndexError:
+			return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 		question_record.answer=answer
 
 	if teacher_name != None:
@@ -131,20 +136,22 @@ def log_question_info_db(request):
 			year=request.session.get("year",None)
 			group_name=request.session.get("group",None)
 			if group_name != None and year != None:
-				academic_year = AcademicYear.objects.filter(start=year)[0]
-				group = Group.objects.filter(teacher=teacher, academic_year = academic_year, name = group_name)
-				if len(group) > 0:
-					group=group[0]
-					usage_record.group = group
-					question_record.group = group
-					
-					student_name=request.session.get("student", None)
-					if student_name != None:
-						student = Student.objects.filter(teacher=teacher,group=group,student_id=student_name)
-						if len(student) > 0:
-							student=student[0]
-							question_record.student = student
-							question_record.student = student
+				academic_year = AcademicYear.objects.filter(start=year)
+				if len(academic_year) > 0:
+					academic_year = academic_year[0]
+					group = Group.objects.filter(teacher=teacher, academic_year = academic_year, name = group_name)
+					if len(group) > 0:
+						group=group[0]
+						usage_record.group = group
+						question_record.group = group
+						
+						student_name=request.session.get("student", None)
+						if student_name != None:
+							student = Student.objects.filter(teacher=teacher,group=group,student_id=student_name)
+							if len(student) > 0:
+								student=student[0]
+								question_record.student = student
+								question_record.student = student
 	usage_record.save()
 	question_record.save()
 	print("test success")

@@ -36,14 +36,14 @@ class FragmentStyle(models.Model):
 	bold = models.BooleanField(default=False)
 	italic = models.BooleanField(default=False)
 	underlined = models.BooleanField(default=False)
-	font_size = models.SmallIntegerField(default=12)
+	font_size = models.SmallIntegerField()
 	type = models.ForeignKey(FragmentType, blank=True, null=True)
 	
 	# Prepare the fragment style in the form of css attributes
 	def __unicode__(self):
 		style=""
 		if self.font != None:
-			style += "font-family: "+self.font + ";"
+			style += "font-family:"+self.font + ";"
 		if self.bold != None and self.bold:
 			style += "font-weight: bold;"
 		if self.italic != None and self.italic:
@@ -51,7 +51,7 @@ class FragmentStyle(models.Model):
 		if self.underlined != None and self.underlined:
 			style += "text-decoration: underline;"
 		if self.font_size != None:
-			style += "font-size: " + str(self.font_size) + "px;"
+			style += "font-size:" + str(self.font_size) + "px;"
 		return style
 		
 # A class for documents
@@ -78,6 +78,25 @@ class Fragment(models.Model):
 	def __unicode__(self):
 		return self.text
 	
+	"""	
+	def __init__(self, *args, **kwargs):
+		super(Fragment, self).__init__(*args, **kwargs)
+		self.visible = False
+		self.highlighted = False
+		
+	def reset(self):
+		self.visible = False
+		self.highlighted = False
+	"""
+"""
+class UserProfile(models.Model):
+	user = models.OneToOneField(User)
+	type = models.CharField(max_length=128)
+
+	# Override the __unicode__() method to return out something meaningful!
+	def __unicode__(self):
+		return self.user.username
+"""
 
 class Step(models.Model):
 	application = models.ForeignKey(Application)
@@ -148,7 +167,7 @@ class Option(models.Model):
 
 
 	def __unicode__(self):
-		return "".join(("Option: ", str(self.number), ". ", self.content))
+		return " ".join(("ID",str(self.id),"Option: ", str(self.number), ". ", self.content))
 
 		
 class Panel(models.Model):
@@ -185,7 +204,7 @@ class AcademicYear(models.Model):
 		
 class Teacher(models.Model):
 	user = models.OneToOneField(User)
-	can_analyse = models.BooleanField(default=False)
+	can_analyse = models.BooleanField(default=False) ### TODO maybe make it int insted? ###
 	
 	def __unicode__(self):
 		return " ".join((self.user.username ,str(self.can_analyse)))
@@ -220,7 +239,7 @@ class UsageRecord(models.Model):
 	group = models.ForeignKey(Group, blank=True, null=True)
 	student = models.ForeignKey(Student, blank=True, null=True)
 	step = models.ForeignKey(Step)
-	session_id = models.CharField(max_length=100, blank=True, null=True)
+	session_id = models.CharField(max_length=100)
 	time_on_step = models.FloatField(default=0)
 	direction = models.CharField(max_length=10)
 	step_number = models.IntegerField()
@@ -257,7 +276,7 @@ class QuestionRecord(models.Model):
 	teacher = models.ForeignKey(Teacher, blank=True, null=True)
 	group = models.ForeignKey(Group, blank=True, null=True)
 	student = models.ForeignKey(Student, blank=True, null=True)
-	session_id = models.CharField(max_length=100, blank=True, null=True)
+	session_id = models.CharField(max_length=100)
 	answer = models.ForeignKey(Option, blank=True, null=True) # TODO Maybe remove
 	answer_text=models.TextField()
 
