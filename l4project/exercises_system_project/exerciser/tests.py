@@ -127,7 +127,7 @@ class LogQuestionInfoDbTests(TestCase):
 		c.login(username='test user',password='password')
 		engine = import_module(settings.SESSION_ENGINE)
 		store = engine.SessionStore()
-		store.save()  # we need to make load() work, or the cookie isworthless
+		store.save()  
 		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 		session = c.session
 		session.update({'teacher': 'test user', 'group' : 'test group', 'year':2014})
@@ -136,12 +136,12 @@ class LogQuestionInfoDbTests(TestCase):
 		response = c.post(reverse('log_question_info_db'), {'time': 20, 'step': 1, 'direction' : 'next', 'example_name':'invalid app','answer':'test option','multiple_choice':'true'})
 		self.assertEqual(response.status_code, 200)
 		
-	def test_log_question_info_db_invalid_data(self):
+	def test_log_question_info_db_invalid_option(self):
 		c = Client()
 		c.login(username='test user',password='password')
 		engine = import_module(settings.SESSION_ENGINE)
 		store = engine.SessionStore()
-		store.save()  # we need to make load() work, or the cookie isworthless
+		store.save()  
 		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 		session = c.session
 		session.update({'teacher': 'test user', 'group' : 'test group', 'year':2014})
@@ -162,4 +162,33 @@ class LogQuestionInfoDbTests(TestCase):
 		session.save()
 
 		response = c.post(reverse('log_question_info_db'), {'invalid key': 20, 'step': 1, 'direction' : 'next', 'example_name':'test app','answer':'test option','multiple_choice':'true'})
+		self.assertEqual(response.status_code, 200)
+		
+		
+		
+class StudentGroupListTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		
+
+	def test_student_group_list_valid(self):
+		c = Client()
+		response = c.get(reverse('student_group_list'), {'teacher': 'test user', 'year':2014, 'group':'test group'})
+		self.assertEqual(response.status_code, 200)
+		
+	def test_student_group_list_invalid_data(self):
+		c = Client()
+		response = c.get(reverse('student_group_list'), {'teacher': 'invalid user', 'year':2014, 'group':'test group'})
+		self.assertEqual(response.status_code, 200)
+		
+	def test_student_group_list_invalid_key(self):
+		c = Client()
+		response = c.get(reverse('student_group_list'), {'invalid': 'test user', 'year':2014, 'group':'test group'})
 		self.assertEqual(response.status_code, 200)
