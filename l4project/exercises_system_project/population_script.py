@@ -230,11 +230,15 @@ def add_change(application, step, element):
 				document = Document.objects.get(name = documentName)
 			elif child.tag == 'question':
 				question_text = child.attrib['content']
+				question_text = question_text.replace('<','&lt')
+				question_text = question_text.replace('>','&gt')
 				question = Question.objects.get_or_create(application=application, step = step, question_text = question_text)[0]
 				for option in child:
 					optionAttributesList = option.attrib
 					number = json.loads(optionAttributesList['num'])
 					content = optionAttributesList['content']
+					content = content.replace('<','&lt')
+					content = content.replace('>','&gt')
 					o = Option.objects.get_or_create(question = question, number = number, content = content)[0]
 			else: 
 				print(child.tag)
