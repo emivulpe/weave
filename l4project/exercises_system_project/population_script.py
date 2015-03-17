@@ -40,8 +40,10 @@ def add_fragment_style(document_type,fragment_type, text_style_attr_dict):
 	bold = str_to_bool(text_style_attr_dict['bold'])
 	italic = str_to_bool(text_style_attr_dict['italic'])
 	underlined = str_to_bool(text_style_attr_dict['underline'])
-	fragmet_style = FragmentStyle.objects.get_or_create(font = font,bold = bold, italic = italic, underlined = underlined, font_size = font_size,type=fragment_type)[0]
-	return fragmet_style
+	fragment_style = FragmentStyle.objects.get_or_create(font = font,bold = bold, italic = italic, underlined = underlined, font_size = font_size,type=fragment_type)[0]
+	if fragment_style is None:
+		print "none"
+	return fragment_style
 	
 def add_document_type(document_type_attr_dict):
 	name = document_type_attr_dict['name']
@@ -49,6 +51,8 @@ def add_document_type(document_type_attr_dict):
 	document_type = DocumentType.objects.get_or_create(name=name)[0]
 	document_type.kind = kind
 	document_type.save()
+	if document_type is None:
+		print "doc type none"
 	return document_type
 
 	
@@ -56,6 +60,8 @@ def add_fragment_type(document_type,fragment_type_attr_dict):
 	name = fragment_type_attr_dict['name']
 	kind = fragment_type_attr_dict['kind']
 	fragment_type = FragmentType.objects.get_or_create(document_type=document_type,name=name,kind=kind)[0]
+	if fragment_type is None:
+		print "frag type none"
 	return fragment_type
 	
 
@@ -102,6 +108,7 @@ def add_document(attributesDict):
 		d.save()
 		return d
 	except (IntegrityError, IndexError, KeyError):
+		print "doc none"
 		return None
 
 # ASK how to populate style depending on fragment type automatically
@@ -122,6 +129,7 @@ def add_fragment(doc, attributesDict):
 		f = Fragment.objects.get_or_create(id = id,document = doc, style = fragment_style, type = fragment_type, text = text, order = order)[0]
 
 	except (IntegrityError, IndexError, KeyError):
+		print "frag none"
 		pass
 
 ##############################################################################################
@@ -149,6 +157,7 @@ def add_application(app):
 			panelAttributesDict = panel.attrib
 			add_panel(application,panelAttributesDict)
 	except (IntegrityError, KeyError):
+		print "app none"
 		pass
 	
 def add_panel(application, attributesDict):
@@ -161,6 +170,7 @@ def add_panel(application, attributesDict):
 			document = document[0]
 			p = Panel.objects.get_or_create(application = application, number = number, type = type, document = document)[0]
 	except (IntegrityError, ObjectDoesNotExist, KeyError):
+		print "panel none"
 		pass
 
 ##############################################################################################
@@ -200,6 +210,7 @@ def add_step(application, attributesDict):
 		s = Step.objects.get_or_create(application=application, order = order)[0]
 		return s
 	except (IntegrityError, ObjectDoesNotExist):
+		print "step none"
 		return None
 
 #assumes that fragment and operation appear at most once. If more, the last value is taken
@@ -233,6 +244,7 @@ def add_change(application, step, element):
 		else:
 			c = Change.objects.get_or_create(document = document, step = step, question = question, operation = operation)[0]
 	except (IntegrityError, ObjectDoesNotExist, KeyError):
+		print "change none"
 		pass
 			
 def add_explanation(step, element):
@@ -241,6 +253,7 @@ def add_explanation(step, element):
 	try:
 		e = Explanation.objects.get_or_create(step = step, text = text)[0]
 	except:
+		print "explanations none"
 		pass
 
 
@@ -259,16 +272,16 @@ if __name__ == '__main__':
 	populate_doc_types(doc_types_path)
 	
 	# Specify the file containing Documents
-	documents_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Documents.xml')
+	documents_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew2/Documents.xml')
 	populate_documents(documents_path)
 
 	# Specify the file containing Applications
-	applications_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Applications.xml')
+	applications_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew2/Applications.xml')
 	populate_applications(applications_path)
 	
 	
 	# Specify the file containing Processes
-	processes_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew/Processes.xml')
+	processes_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew2/Processes.xml')
 	populate_processes(processes_path)
 	
 	#Add an academic year
