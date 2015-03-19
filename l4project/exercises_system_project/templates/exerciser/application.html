@@ -93,6 +93,9 @@ html, body {
 				</div>
 			</div>
 		{% else %}
+		<div id="does_not_exist_dialog" title="Application does not exist" style="display:none;">
+			<span id = "does_not_exist_message"></span>
+		</div>
 			<strong>Application is empty.</strong>
 		{% endif %}
 	{% else %}

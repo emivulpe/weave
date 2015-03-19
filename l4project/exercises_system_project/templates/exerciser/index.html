@@ -86,7 +86,7 @@
 					
 							<td style="width: 40%; text-align: right; padding-right: 10px;">Teacher ID:</td>
 							<td style="text-align: left;">
-								<input id = "teacher" type="text" name="TeacherId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the teacher id provided by your teacher or click on <No teacher ID> button to proceed."></i>
+								<input id = "teacher" type="text" name="TeacherId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the teacher id provided by your teacher. If you weren't given such an ID, click on <No teacher ID> button to proceed."></i>
 							</td>
 						</tr>
 						
@@ -99,7 +99,7 @@
 										<option value="{{year.start}}" >{{ year.start}}/{{ year.start|add:"1" }}</option>
 									{% endfor %}
 								</select>
-								<i class="fa fa-question-circle" title="Enter the academic year your group belongs to or click on the <No year> button to proceed."></i>
+								<i class="fa fa-question-circle" title="Choose the academic year your group belongs to. If you weren't given a Group ID, click on the <No year> button to proceed."></i>
 							</td>
 						</tr>
 						<tr id="group_details" class="details" style="display:none">
@@ -111,7 +111,7 @@
 						<tr id="student_details" class="details" style="display:none" >
 							<td style="width: 40%; text-align: right; padding-right: 10px;">Student ID: </td>
 							<td style="text-align: left;">
-								<input id = "student" type="text" name="StudentId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the student ID your teacher assigned to you or click on <No student ID> button to proceed."></i>
+								<input id = "student" type="text" name="StudentId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the student ID your teacher assigned to you. If you weren't given such an ID, click on <No student ID> button to proceed."></i>
 							</td>
 						</tr>
 						<tr>
@@ -202,7 +202,7 @@ function goToTutorialStep(tutorialStep){
 			$("#tutorial_screenshot").attr("src","{% static 'media/select application.jpg' %}");
 			break;
 		case 5:
-			$("#tutorial_text").text("Start by clicking on the Start button on the top right of the page. ");
+			$("#tutorial_text").text("Start an example by clicking on the Start button on the top right of the page. ");
 			$("#tutorial_screenshot").attr("src","{% static 'media/start.jpg' %}");
 			break;
 		case 6:
@@ -365,7 +365,7 @@ function goToTutorialStep(tutorialStep){
 		}
 		function saveStudent(){
 			$("#success_message").text('');
-			$("#back_button").hide();
+			//$("#back_button").hide();
 			var student = $("#student").val();
 			console.log("in student save ");
 			var request = $.post("/weave/register_student_with_session/",
@@ -380,11 +380,13 @@ function goToTutorialStep(tutorialStep){
 					console.log("in student save " + success);
 					student_name=student;
 					storeDetails();
+					$("#back_button").hide();
 				}
 				
 				else{
 
 					$("#success_message").text("Sorry, but the student ID " + student + " is invalid.Please try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No student ID>.");
+					//$("#back_button").show();
 				}
 			});
 		};
@@ -412,7 +414,7 @@ function goToTutorialStep(tutorialStep){
 				
 				else{
 					console.log("no such group");
-					$("#success_message").text("Sorry, but teacher ID " + teacher +  " is invalid. Please, try again, or click <No teacher ID> button to continue!");
+					$("#success_message").text("Sorry, but teacher ID " + teacher +  " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No Teacher ID> to continue!");
 				}
 				
 				$("#buttons").show();
@@ -441,7 +443,7 @@ function goToTutorialStep(tutorialStep){
 				}
 				else{
 					console.log("no such group");
-					$("#success_message").text("Sorry, but the group ID " + group + " is invalid. Please, try again, or click <No group ID> button to continue!!");
+					$("#success_message").text("Sorry, but the group ID " + group + " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an ID to work with, just press <No Group ID> to continue!");
 				}
 				$("#buttons").show();
 			});
