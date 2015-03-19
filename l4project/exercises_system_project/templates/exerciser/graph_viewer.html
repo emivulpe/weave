@@ -367,7 +367,7 @@ function getStepData(step){
 										for (var option in sel_data[i]) {
 											console.log(option+"OPTION");
 											if ((typeof option)=="string" && option!="students"){
-												option_categories.push(option);
+												option_categories.push(option.replace( "&lt","").replace("&gt",""));
 												option_data.push({"y":sel_data[i][option],"students":sel_data[i]["students"]});
 											}
 										}
@@ -461,8 +461,10 @@ function getStepData(step){
 								x: e.pageX || e.clientX,
 								y: e.pageY || e.clientY
 							},
+							width: 600,
+							height:600,
 							headingText: el.series.name,
-							maincontentText: "	<div id='cont_"+chart_num+"'style='height:250px;width:350px;'> </div><br/> "
+							maincontentText: "	<div id='cont_"+chart_num+"'style='height:90%;width:90%;'> </div><br/> "
 						});
 						var selectedItems={app_name:selectedApplication, group:selectedGroup,year:selectedYear,step:el.x+1};
 						if(selectedOption=="student_time"){
