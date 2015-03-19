@@ -1,10 +1,9 @@
-{% extends 'exerciser/teacher_interface_base.html' %}
+<!DOCTYPE html>
 {% load static %}
-
-		{% block links %}
+<html>
+	<head>
+		<title>Group Sheet</title>
 		<link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.css' %}" />
-		{% endblock %}
-		{% block style %}
 		<style>
 		.ui-dialog-titlebar-close{
 			display: none;
@@ -18,18 +17,10 @@
 
 		}
 		
-		
-		@media print
-		
-		* {display:none;}
-		#student_table {display:table;}
-		
-		
 		</style>
-		{% endblock %}
-
+	</head>
 	
-{% block body_block %}
+	<body>
 	
 	<div id="information_dialog" title="Group Sheet Information" style="margin:20px;display:none;">
 		<div id = "message">
@@ -45,8 +36,8 @@
 	
 	
 	
-		<table id="student_table" border="1" style="width:90%;border: 1px solid black;border-collapse: collapse; margin: 0 auto; ">
-			<caption style = "text-align: center;"><strong>Academic Year: {{ year }}, Group: {{ group }}</strong> </caption>
+		<table border="1" style="width:100%;border: 1px solid black;border-collapse: collapse; ">
+			<caption>Academic Year: {{ year }}, Group: {{ group }} </caption>
 			<tr>
 				<th>Firstname</th>
 				<th>Lastname</th> 
@@ -63,9 +54,9 @@
 			</tr>		
 			{% endfor %}
 		</table>
-{% endblock %}
+	</body>
+</html>
 
-{% block javascripts %}
 <script type="text/javascript" src="{% static 'js/jquery-2.1.1.js'  %}"></script>
 <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script>
@@ -85,4 +76,3 @@
 	});
 </script>
 
-{% endblock %}
