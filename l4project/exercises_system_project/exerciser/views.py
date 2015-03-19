@@ -48,6 +48,7 @@ def log_info_db(request):
 	except KeyError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	session_id = request.session.session_key
+	print "session", session_id
 
 	print current_step, "CUR STER"
 	print direction, "DIR"
@@ -108,7 +109,9 @@ def log_question_info_db(request):
 	except KeyError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_name=request.session.get("teacher",None)
+	#session_id = request.session.get("session_key","default session")
 	session_id = request.session.session_key
+	print "session", session_id
 	answer_text = answer_text.replace('<', '&lt')#
 	answer_text = answer_text.replace('>', '&gt')
 	try:
@@ -562,9 +565,7 @@ def application(request, application_name_url):
 			size_panels = (100/len(panels))
 			context_dict['panel_size'] = str(size_panels)
 		except Application.DoesNotExist:
-			# We get here if we didn't find the specified category.
-			# Don't do anything - the template displays the "no category" message for us.
-			return render_to_response('exerciser/index.html', {}, context)
+			return HttpResponseRedirect('/weave/')
 
 		# Go render the response and return it to the client.
 		return render_to_response('exerciser/application.html', context_dict, context)

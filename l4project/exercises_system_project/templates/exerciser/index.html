@@ -8,13 +8,13 @@
 	}
 {% endblock %}
 	
-		{% block reset_registration %}
-			{% if request.session.student_registered %}
-				<a class="navbar-brand" href="#" onclick="resetRegistration()">
-					<i class="fa fa-refresh landing-icon fa"></i>&nbsp;<span class="landing-text" style="position: relative; top: 2px;">Reset details</span>
-				</a>
-			{% endif %}
-		{% endblock %}
+{% block reset_registration %}
+	{% if request.session.student_registered %}
+		<a class="navbar-brand" href="#" onclick="resetRegistration()">
+			<i class="fa fa-refresh landing-icon fa"></i>&nbsp;<span class="landing-text" style="position: relative; top: 2px;">Reset details</span>
+		</a>
+	{% endif %}
+{% endblock %}
 	
 {% block body_block %}
 
@@ -23,112 +23,104 @@
 			<div class="col-md-6 text-center">
 				<br/><br/>
 				{% if request.session.student_registered %}
-					
 					<strong>You are registered
-					{% if request.session.teacher %} 
-						 with teacher id {{request.session.teacher}}
-					
-						{% if request.session.group %} 
-							 with group id {{request.session.group}}
-							 {% if request.session.year %} 
-								 ({{request.session.year}}/{{request.session.year|add:"1"}})
-					
-								{% if request.session.student %} 
-									 with student id {{request.session.student}}.
+						{% if request.session.teacher %} 
+							 with teacher id {{request.session.teacher}}
+							{% if request.session.group %} 
+								 with group id {{request.session.group}}
+								{% if request.session.year %} 
+									 ({{request.session.year}}/{{request.session.year|add:"1"}})
+									{% if request.session.student %} 
+										 with student id {{request.session.student}}.
+									{% else %}
+										. 
+									{% endif %}
 								{% else %}
 									. 
 								{% endif %}
 							{% else %}
-								. 
-								
+								.
 							{% endif %}
 						{% else %}
-							.
+							 anonymously.
 						{% endif %}
-					{% else %}
-						 anonymously.
-					{% endif %}
-					
-					<br/><br/>
-					<div style="text-align:left;">
-					<table style="margin: 0 auto;">
-						<tr>
-						<td>
-							<input placeholder="Search Application" id="application_search_box" type="text" style="margin:10px;"/> 
-						</td>
-						</tr>
-						<tr>
-						<td>
-						{% if applications %}
-						<ul class="navList" style=" list-style-type: none; ">
-							{% for application in applications %}
-								<li><a href="/weave/application/{{ application.url }}" style="color:gray;">{{ application.name }}</a></li>
-							{% endfor %}
-						</ul>
-						{% else %}
-							<strong>There are no applications present!</strong>
-						{% endif %}
-						</td>
-						</tr>
+						<br/><br/>
+						<div style="text-align:left;">
+						<table style="margin: 0 auto;">
+							<tr>
+								<td>
+									<input placeholder="Search Application" id="application_search_box" type="text" style="margin:10px;"/> 
+								</td>
+							</tr>
+							<tr>
+								<td>
+								{% if applications %}
+								<ul class="navList" style=" list-style-type: none; ">
+									{% for application in applications %}
+										<li><a href="/weave/application/{{ application.url }}" style="color:gray;">{{ application.name }}</a></li>
+									{% endfor %}
+								</ul>
+								{% else %}
+									<strong>There are no applications present!</strong>
+								{% endif %}
+								</td>
+							</tr>
 						</table>
 					</div>
 					</strong>
-
-
 				{% else %}
-				<h1 class="details">Specify your details</h1>
-				<br>
-				<form id="detail_form" style=" margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;">
-				
-					<table style="width:100%;">
-					
-						<tr id="teacher_details" class="details" style="display:none">
-					
-							<td style="width: 40%; text-align: right; padding-right: 10px;">Teacher ID:</td>
-							<td style="text-align: left;">
-								<input id = "teacher" type="text" name="TeacherId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the teacher id provided by your teacher. If you weren't given such an ID, click on <No teacher ID> button to proceed."></i>
-							</td>
-						</tr>
-						
-						<tr id="year_details" class="details" style="display:none">
-					
-							<td style="width: 40%; text-align: right; padding-right: 10px;">Academic Year:</td>
-							<td style="text-align: left;">
-								<select id="academic_year_select" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;">
-									{% for year in academic_years %}
-										<option value="{{year.start}}" >{{ year.start}}/{{ year.start|add:"1" }}</option>
-									{% endfor %}
-								</select>
-								<i class="fa fa-question-circle" title="Choose the academic year your group belongs to. If you weren't given a Group ID, click on the <No year> button to proceed."></i>
-							</td>
-						</tr>
-						<tr id="group_details" class="details" style="display:none">
-							<td style="width: 40%; text-align: right; padding-right: 10px;">Group ID:</td>
-							<td style="text-align: left;">
-								<select id="group_list" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;"></select><i class="fa fa-question-circle" title="Choose the group your teacher assigned you to or click on <No group ID> button to proceed."></i>
-							</td>
-						</tr>
-						<tr id="student_details" class="details" style="display:none" >
-							<td style="width: 40%; text-align: right; padding-right: 10px;">Student ID: </td>
-							<td style="text-align: left;">
-								<input id = "student" type="text" name="StudentId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the student ID your teacher assigned to you. If you weren't given such an ID, click on <No student ID> button to proceed."></i>
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right;">
-								<input  id = "back_button" type="button" value="Back" style="margin-top: 10px; font-size: 14pt; font-weight: bold;"/>&nbsp;
-							</td>
-							<td style="text-align: left">
-								<input  id = "submit_button" class="save_teacher details" type="submit" value="Next" style="margin-top: 10px; font-size: 14pt; font-weight: bold;" onclick="saveTeacher()"/>&nbsp;
-								<input id = "no_id" class="details" type="submit" value="No teacher ID" onclick="storeDetails()" style="margin-top: 10px; font-size: 14pt; font-weight: bold;"/>
-							</td>
-						</tr>
-					</table>
+					<h1 class="details">Specify your details</h1>
+					<br>
+					<form id="detail_form" style=" margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;">
+						<table style="width:100%;">
+							<tr id="teacher_details" class="details" style="display:none">
+								<td style="width: 40%; text-align: right; padding-right: 10px;">Teacher ID:</td>
+								<td style="text-align: left;">
+									<input id = "teacher" type="text" name="TeacherId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the teacher id provided by your teacher. If you weren't given such an ID, click on <No teacher ID> button to proceed."></i>
+								</td>
+							</tr>
+							
+							<tr id="year_details" class="details" style="display:none">
+								<td style="width: 40%; text-align: right; padding-right: 10px;">Academic Year:</td>
+								<td style="text-align: left;">
+									<select id="academic_year_select" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;">
+										{% for year in academic_years %}
+											<option value="{{year.start}}" >{{ year.start}}/{{ year.start|add:"1" }}</option>
+										{% endfor %}
+									</select>
+									<i class="fa fa-question-circle" title="Choose the academic year your group belongs to. If you weren't given a Group ID, click on the <No year> button to proceed."></i>
+								</td>
+							</tr>
+							
+							<tr id="group_details" class="details" style="display:none">
+								<td style="width: 40%; text-align: right; padding-right: 10px;">Group ID:</td>
+								<td style="text-align: left;">
+									<select id="group_list" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;"></select><i class="fa fa-question-circle" title="Choose the group your teacher assigned you to or click on <No group ID> button to proceed."></i>
+								</td>
+							</tr>
+							
+							<tr id="student_details" class="details" style="display:none" >
+								<td style="width: 40%; text-align: right; padding-right: 10px;">Student ID: </td>
+								<td style="text-align: left;">
+									<input id = "student" type="text" name="StudentId" style="margin-right: 5px; padding: 5px; font-size: 12pt; font-weight: bold; margin-left: 10px;width:200px;" /><i class="fa fa-question-circle" title="Enter the student ID your teacher assigned to you. If you weren't given such an ID, click on <No student ID> button to proceed."></i>
+								</td>
+							</tr>
+							
+							<tr>
+								<td style="text-align: right;">
+									<input  id = "back_button" type="button" value="Back" style="margin-top: 10px; font-size: 14pt; font-weight: bold;"/>&nbsp;
+								</td>
+								<td style="text-align: left">
+									<input  id = "submit_button" class="save_teacher details" type="submit" value="Next" style="margin-top: 10px; font-size: 14pt; font-weight: bold;" onclick="saveTeacher()"/>&nbsp;
+									<input id = "no_id" class="details" type="submit" value="No teacher ID" onclick="storeDetails()" style="margin-top: 10px; font-size: 14pt; font-weight: bold;"/>
+								</td>
+							</tr>
+							
+						</table>
 
-				</form>
-				<br>			
-
-				<strong id="success_message" style = "color:red"></strong>
+					</form>
+					<br>
+					<strong id="unsuccess_message" style = "color:red"></strong>
 				{% endif %}
 			</div>
 				
@@ -302,7 +294,7 @@ function goToTutorialStep(tutorialStep){
 			$("#submit_button").val("Next");
 			$("#submit_button").attr('onclick', 'saveTeacher()');
 			$("#no_id").val('No teacher ID');
-			$("#success_message").text('');
+			$("#unsuccess_message").text('');
 		}
 
 		function chooseGroupStep(){
@@ -318,7 +310,7 @@ function goToTutorialStep(tutorialStep){
 			$("#submit_button").val("Next");
 			$("#submit_button").attr('onclick', 'saveGroup()');
 			$("#no_id").val('No group ID');
-			$("#success_message").text('');
+			$("#unsuccess_message").text('');
 		}
 
 		function chooseStudentStep(){
@@ -333,7 +325,7 @@ function goToTutorialStep(tutorialStep){
 			$("#submit_button").prop("type", "submit");
 			$("#submit_button").attr('onclick', 'saveStudent()');
 			$("#no_id").val('No student ID');
-			$("#success_message").text('');
+			$("#unsuccess_message").text('');
 		}
 		
 		function chooseYearStep(){
@@ -349,7 +341,7 @@ function goToTutorialStep(tutorialStep){
 			$("#submit_button").val("Next");
 			$("#submit_button").attr('onclick', 'saveYear()');
 			$("#no_id").val('No year');
-			$("#success_message").text('');
+			$("#unsuccess_message").text('');
 		}
 		function deleteGroup(){
 			$.post('/weave/del_session_variable/',{csrfmiddlewaretoken : csrftoken, to_delete: 'group'});
@@ -364,7 +356,7 @@ function goToTutorialStep(tutorialStep){
 			chooseTeacherStep();
 		}
 		function saveStudent(){
-			$("#success_message").text('');
+			$("#unsuccess_message").text('');
 			//$("#back_button").hide();
 			var student = $("#student").val();
 			console.log("in student save ");
@@ -385,7 +377,7 @@ function goToTutorialStep(tutorialStep){
 				
 				else{
 
-					$("#success_message").text("Sorry, but the student ID " + student + " is invalid.Please try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No student ID>.");
+					$("#unsuccess_message").text("Sorry, but the student ID " + student + " is invalid.Please try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No student ID>.");
 					//$("#back_button").show();
 				}
 			});
@@ -413,8 +405,8 @@ function goToTutorialStep(tutorialStep){
 				}
 				
 				else{
-					console.log("no such group");
-					$("#success_message").text("Sorry, but teacher ID " + teacher +  " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No Teacher ID> to continue!");
+					console.log("no such teacher");
+					$("#unsuccess_message").text("Sorry, but teacher ID " + teacher +  " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No Teacher ID> to continue!");
 				}
 				
 				$("#buttons").show();
@@ -443,46 +435,13 @@ function goToTutorialStep(tutorialStep){
 				}
 				else{
 					console.log("no such group");
-					$("#success_message").text("Sorry, but the group ID " + group + " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an ID to work with, just press <No Group ID> to continue!");
+					$("#unsuccess_message").text("Sorry, but the group ID " + group + " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an ID to work with, just press <No Group ID> to continue!");
 				}
 				$("#buttons").show();
 			});
 		}
 		
-/*
-		function saveYear(){
 
-			$("#buttons").hide();
-			var year=document.getElementById("academic_year_select").value;
-
-			var request = $.post("/weave/register_year_with_session/",
-			{
-			year : year,
-			csrfmiddlewaretoken : csrftoken
-			});
-			
-			request.done(function(reply) {
-
-				if(reply["success"]){
-				
-					for (var index in reply["groups"]) {
-						var group="<option value='" + reply["groups"][index] +"' >"+reply["groups"][index] + "</option>";
-						$("#group_list").append(group);
-					}
-					
-					academic_year=year;
-
-					chooseGroupStep();
-
-				}
-				else{
-					console.log("no such group");
-					$("#success_message").text("Sorry, but the year " + group + " is invalid. Please, try again, or click <No year> button to continue!!");
-				}
-				$("#buttons").show();
-			});
-		}
-*/	
 		function saveYear(){
 			console.log("in year save ");
 			$("#buttons").hide();
@@ -516,8 +475,8 @@ function goToTutorialStep(tutorialStep){
 
 				}
 				else{
-					console.log("no such group");
-					$("#success_message").text("Sorry, but the year " + group + " is invalid. Please, try again, or click <No year> button to continue!!");
+					console.log("no such year");
+					$("#unsuccess_message").text("Sorry, but the year " + group + " is invalid. Please, try again, or click <No year> button to continue!!");
 				}
 				$("#buttons").show();
 			});
