@@ -679,12 +679,20 @@ def get_question_data(request):
 	selected_data={}
 	quest_text=question.question_text
 	all_options=Option.objects.filter(question=question)
-	question_records = QuestionRecord.objects.filter(application=application, question=question, teacher=teacher,group=group)#
-	print len(question_records)
+	if len(all_options) == 0:
+		return HttpResponse(simplejson.dumps({'open_question':True}), content_type="application/json")
+	question_records = QuestionRecord.objects.filter(application=application, question=question, teacher=teacher,group=group)
+	print len(question_records),"QuestionRecordLen"
 	if student_id is not None:
 		print "not none"
 		print len(question_records)
 		question_records=question_records.filter(student=student)
+		print len(question_records),"QuestionRecordLen"
+	if len(question_records) == 0:
+		print "empty records"
+		selected_data["no_data"] = "True"
+		return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
+
 	sd=[]
 
 	for option in all_options:
@@ -737,9 +745,15 @@ def update_time_graph(request):
 	print 2
 	selected_data={}
 	usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group)
-
+	print usage_records,"records"
 	if student_id is not None:
-		usage_records.filter(student=student)
+		usage_records = usage_records.filter(student=student)
+	print usage_records,"records2"
+	if len(usage_records) == 0:
+		print "empty records"
+		selected_data["no_data"] = "True"
+		return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
+
 	print 4
 	question_steps=[]
 	app_questions=Question.objects.filter(application=selected_application)
@@ -785,7 +799,7 @@ def update_time_graph(request):
 				sd.append({"y":time['time'],"revisited_count":revisited_steps_count,"explanation":explanation_text,"explanation_start":explanation_text_start})
 	if sd!=[]:
 		selected_data["data"]=sd
-		print sd , " SD PRINTED"
+		#print sd , " SD PRINTED"
 		selected_data["question_steps"]=question_steps
 
 	return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
@@ -820,6 +834,8 @@ def update_class_steps_graph(request):
 	selected_data={}
 	sd=[]
 	usage_records = UsageRecord.objects.filter(application=application,teacher=teacher,group=selected_group,step=step)
+	if len(usage_records) == 0:
+		return HttpResponse(simplejson.dumps({'no_data': True}), content_type="application/json")
 
 	for record in usage_records:
 		if record.student != None:
