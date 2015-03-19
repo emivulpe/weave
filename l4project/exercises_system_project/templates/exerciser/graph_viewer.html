@@ -530,22 +530,29 @@
 			var request = $.get('/weave/populate_summary_table/', {application:selectedApplication, group:selectedGroup, year:selectedYear})
 
 			request.done(function(summary_data) {
-
-				for (student in summary_data["selected_data"]){
-					$("#summary_data").append("<tr id='student_"+student+"' class='student_info'></tr>");
-					var studentData = summary_data[student];
-					$("#student_"+student).append("<td>" + student + "</td>");
-					$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["total_time"].toFixed(1) + "</td>");
-					$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["num_steps_revisited"] + "</td>");
-					$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["last_step"] + "</td>");
-
+				if ("error" in summary_data){
+					$('#container').show();
+					$('#summary_data').hide();
+					$('#container').html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>Invalid selection</span><div>");
+					console.log("invalid selection");
 				}
-				$("#summary_data_caption").append(selectedApplication + " (" + summary_data["total_steps"] + " steps)");
+				else{
+					for (student in summary_data["selected_data"]){
+						$("#summary_data").append("<tr id='student_"+student+"' class='student_info'></tr>");
+						var studentData = summary_data[student];
+						$("#student_"+student).append("<td>" + student + "</td>");
+						$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["total_time"].toFixed(1) + "</td>");
+						$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["num_steps_revisited"] + "</td>");
+						$("#student_"+student).append("<td>" + summary_data["selected_data"][student]["last_step"] + "</td>");
 
-						
+					}
+					$("#summary_data_caption").append(selectedApplication + " (" + summary_data["total_steps"] + " steps)");
+					$("#summary_data").show();
+				}
+
 			});
 
-			$("#summary_data").show();
+			
 		}
 
 		// Refactor make it like add students

@@ -245,11 +245,6 @@ class UsageRecord(models.Model):
 		self.step_number = self.step.order
 		super(UsageRecord, self).save(*args, **kwargs)
 
-"""
-class QuestionRecord1(models.Model):
-	record = models.OneToOneField(UsageRecord)
-	answer = models.ForeignKey(Option)
-"""
 
 class QuestionRecord(models.Model):
 	application = models.ForeignKey(Application)

@@ -570,7 +570,7 @@ def application(request, application_name_url):
 		# Go render the response and return it to the client.
 		return render_to_response('exerciser/application.html', context_dict, context)
 	else:
-		return render_to_response('exerciser/index.html', {}, context)
+		return HttpResponseRedirect('/weave/')
 
 
 
