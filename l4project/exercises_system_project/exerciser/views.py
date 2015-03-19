@@ -564,7 +564,7 @@ def application(request, application_name_url):
 		except Application.DoesNotExist:
 			# We get here if we didn't find the specified category.
 			# Don't do anything - the template displays the "no category" message for us.
-			pass
+			return render_to_response('exerciser/index.html', {}, context)
 
 		# Go render the response and return it to the client.
 		return render_to_response('exerciser/application.html', context_dict, context)

@@ -55,6 +55,12 @@ html, body {
 	.caret{
 		color:gray;
 	}
+	.centered {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
 
 {% endblock %}
 
@@ -93,13 +99,10 @@ html, body {
 				</div>
 			</div>
 		{% else %}
-		<div id="does_not_exist_dialog" title="Application does not exist" style="display:none;">
-			<span id = "does_not_exist_message"></span>
-		</div>
 			<strong>Application is empty.</strong>
 		{% endif %}
 	{% else %}
-		The specified application {{ application_name }} does not exist!
+		<strong class = "centered">The specified application {{ application_name }} does not exist!</strong>
 	{% endif %}
 			
 	<div id="overlay" class="web_dialog_overlay"></div>
@@ -196,5 +199,18 @@ html, body {
 			draggingClass:"dragging" 
 			//onResize:onSampleResized
 			});
+			
+			
+		$(function() {
+			$( "#invalid_application_dialog" ).dialog({
+			  modal: true,
+			  autoOpen: false,
+			  buttons: {
+				Ok: function() {
+				  $( this ).dialog( "close" );
+				  location.reload(); // Reload the page to reflect the new changes
+				}
+			}
+		});
 	</script>
 {% endblock %}
