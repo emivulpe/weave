@@ -579,7 +579,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 			var chosen_group = document.getElementById("group").value;
 			var selected_year=$("#group_year").val();
 			var variables="?group="+chosen_group+"&teacher={{ user.username }}&year="+selected_year;
-			window.location="/weave/teacher_interface/get_group_list"+variables;
+			window.location="/weave/get_group_list"+variables;
 		});
 
   $(function() {
