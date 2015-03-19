@@ -958,8 +958,11 @@ def register(request):
 		# If the form is valid...
 		if user_form.is_valid():
 			# Save the user's form data to the database.
-			user = user_form.save()
-
+			try:
+				user = user_form.save()
+			except ValueError:
+				print "VALUE ERROR"
+				pass
 			# Now we hash the password with the set_password method.
 			# Once hashed, we can update the user object.
 			user.set_password(user.password)
