@@ -150,7 +150,7 @@
 									<select id="group" class="group" style="width:100%;"></select>
 								</td>
 								<td style="padding-left:10px;">
-									<i class="fa fa-question-circle" title="Select the group you would like to see ids for."></i>
+									<i class="fa fa-question-circle" title="Select the group you would like to see the student ids for."></i>
 								</td>
 							</tr>
 							<tr>
@@ -211,7 +211,7 @@
 						</form><br/>
 						<div style="font-size: 12pt; font-weight: bold;"> 
 							<i class="fa fa-close success" style="color:red;"></i>
-							<strong class="success" style="color:red;">Your registration was unsuccessful. Please try again!</strong>
+							<strong class="success" style="color:red;">Your registration was unsuccessful. Please ensure that the passwords entered match. If they do, please try a different username!</strong>
 						</div>
 					{% else %}
 						<h1>Register here!</h1><br />
@@ -546,7 +546,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 			}
 			else{
 				$("#success_message").before("<i class='fa fa-times success_icon' style='color:red'></i>");
-				$("#success_message").text(" There was a problem making the changes to group " + chosenGroup + "! Please try again!");
+				$("#success_message").text(" The selected action is inappropriate for a group with name " + chosenGroup + "!");
 				$("#success_message").css("color","red");
 			}
 			$("#success_dialog").dialog('open');

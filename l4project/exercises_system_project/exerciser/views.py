@@ -925,6 +925,7 @@ def teacher_interface(request):
 				group_names.append(str(group.name))
 			groups[academic_year.start]= group_names
 
+
 	questionnaire_form = SampleQuestionnaireForm()
 
 	context_dict = {'applications' : application_list,'user_form': user_form, 'groups': groups,'academic_years':academic_years,'questionnaire_form':questionnaire_form}
@@ -965,7 +966,8 @@ def register(request):
 				pass
 			# Now we hash the password with the set_password method.
 			# Once hashed, we can update the user object.
-			user.set_password(user.password)
+			password = user.password
+			user.set_password(password)
 			user.save()
 			teacher=Teacher(user=user)
 			try:
