@@ -596,6 +596,18 @@ def get_students(request):
 	students = map(str, students)
 	return HttpResponse(simplejson.dumps(students), content_type="application/json")
 	
+	
+def get_largest_step(request):
+	print "in get largest step"
+	try:
+		app_name = request.GET['application']
+	except KeyError:
+		return HttpResponse(simplejson.dumps({'error':'Bad input supplied in get groups'}), content_type="application/json")
+	application = Application.objects.filter(name = app_name)
+	total_steps=application.aggregate(num_steps=Count('step'))['num_steps']
+	print total_steps , "TOTAL STEPS"
+	return HttpResponse(simplejson.dumps({'steps':total_steps}), content_type="application/json")
+	
 ### Checks added. Looks fine ###
 def get_groups(request):
 	print "in get groups!"
