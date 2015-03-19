@@ -831,7 +831,8 @@ def update_class_steps_graph(request):
 	except KeyError:
 		print "error key"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
-		
+	if step_num == 'NaN':
+		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_username = request.user
 	try:
 		user=User.objects.filter(username=teacher_username)[0]
