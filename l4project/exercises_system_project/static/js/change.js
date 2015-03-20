@@ -87,11 +87,11 @@ function goToStep(direction) {
 			var now = new Date().getTime();			
 			$.post("/weave/log_info_db/",
 			{
-				time : (now - lastTime) / 1000,
-				step : currentStep,
-				direction : direction,
-				csrfmiddlewaretoken : csrftoken,
-				example_name : app_name
+				'time' : (now - lastTime) / 1000,
+				'step' : currentStep,
+				'direction' : direction,
+				'csrfmiddlewaretoken' : csrftoken,
+				'example_name' : app_name
 			});
 			lastTime = now;
 			console.log("Current step " + currentStep);
@@ -247,12 +247,12 @@ $(document).ready(function ()
 			var now = new Date().getTime();
 			if(currentStep>0){
 				$.post("/weave/log_question_info_db/",
-				{	time : (now - lastTime) / 1000,
-					step : currentStep,
-					answer : answer,
-					example_name : app_name,
-					csrfmiddlewaretoken : csrftoken,
-					multiple_choice:multipleChoiceQuestion
+				{	'time' : (now - lastTime) / 1000,
+					'step' : currentStep,
+					'answer' : answer,
+					'example_name' : app_name,
+					'csrfmiddlewaretoken' : csrftoken,
+					'multiple_choice':multipleChoiceQuestion
 				});
 			}
 			lastTime = now;
@@ -314,6 +314,9 @@ document.onkeydown = function(e) {
 
 
 function escapeHtml(unsafe) {
+	if(unsafe == null){
+		return "";
+	}
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")

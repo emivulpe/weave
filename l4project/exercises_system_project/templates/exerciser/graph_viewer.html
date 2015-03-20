@@ -122,7 +122,7 @@
 					selectedOption = document.getElementById("statistics_options").value; 
 					url='/weave/update_class_steps_graph/';
 					console.log("STEPPPPPPPPPPPPPP " + step);
-					var selectedItems={application:selectedApplication,group:selectedGroup,year:selectedYear,step:step};
+					var selectedItems={'application':selectedApplication,'group':selectedGroup,'year':selectedYear,'step':step};
 					var chartDetails={"xAxisTitle":"Students","yAxisTitle":"Time","seriesName":selectedApplication + "- Group " + selectedGroup,"chartType":"column","selectedOption":"class_steps","chartSubtitle":"Step " + step}
 					drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 				}
@@ -156,7 +156,7 @@
 					selectedOption = document.getElementById("statistics_options").value; 
 					url='/weave/update_class_steps_graph/';
 					console.log("STEPPPPPPPPPPPPPP " + step);
-					var selectedItems={application:selectedApplication,group:selectedGroup,year:selectedYear,step:step};
+					var selectedItems={'application':selectedApplication,'group':selectedGroup,'year':selectedYear,'step':step};
 					var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:selectedApplication + "- Group " + selectedGroup,"chartType":"column",selectedOption:"class_steps","chartSubtitle":"Step " + step}
 					drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 				}
@@ -214,11 +214,14 @@
 			});
 			
 			// Update the question selection to the questions for the selected application
-			$("#application").mouseup(function() {
-				$("#application").bind('mouseout',function() {
-					$("#question_list").bind('mouseover',function(){addQuestions()});
-					$("#step_list").bind('mouseover',function(){addSteps()});
-					$("#application").unbind('mouseout');
+			$("#application").mouseover(function() {
+				$("#application").bind('mouseup',function() {
+					$("#application").bind('mouseout',function() {
+						$("#question_list").bind('mouseover',function(){addQuestions()});
+						$("#step_list").bind('mouseover',function(){addSteps()});
+						$("#application").unbind('mouseup');
+						$("#application").unbind('mouseout');
+					});
 				});
 			});	
 			
@@ -364,9 +367,7 @@
 									categories=option_categories;
 									
 								}
-								console.log(chartSubtitle + "CHART SUBTITLEEEEEEEEE");
 							drawChart(chartContainer,selectedOption,chartType,selectedApplication,selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,seriesFormat,chartClickHandler,questionSteps, seriesName,sel_data,tooltipFormat,selectedYear);
-							console.log(chartSubtitle + "CHART SUBTITLEEEEEEEEE");
 							}
 						}	
 					}
@@ -441,7 +442,7 @@
 							headingText: el.series.name,
 							maincontentText: "	<div id='cont_"+chart_num+"'style='height:90%;width:90%;'> </div><br/> "
 						});
-						var selectedItems={app_name:selectedApplication, group:selectedGroup,year:selectedYear,step:el.x+1};
+						var selectedItems={'app_name':selectedApplication, 'group':selectedGroup,'year':selectedYear,'step':el.x+1};
 						if(selectedOption=="student_time"){
 							selectedStudent = document.getElementById("student_list").value; 
 							console.log(selectedStudent+"STUDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEENT");
@@ -520,7 +521,7 @@
 					else if (selectedOption=="student_time"){
 						selectedStudent = document.getElementById("student_list").value; 
 						console.log(selectedStudent);
-						var selectedItems={app_name:selectedApplication, group:selectedGroup, year:selectedYear, student:selectedStudent};
+						var selectedItems={'app_name':selectedApplication, 'group':selectedGroup, 'year':selectedYear, 'student':selectedStudent};
 						var chartDetails={"chartType":"line","chartSubtitle":"",
 "xAxisTitle":"Steps","yAxisTitle":"Seconds","seriesName":selectedApplication + "- Group " + selectedGroup};
 						var url='/weave/update_time_graph/';
@@ -533,7 +534,7 @@
 		function drawClassSummaryTable(selectedApplication, selectedGroup, selectedYear){
 			$(".student_info").remove();
 			$("#summary_data_caption").empty();
-			var request = $.get('/weave/populate_summary_table/', {application:selectedApplication, group:selectedGroup, year:selectedYear})
+			var request = $.get('/weave/populate_summary_table/', {'application':selectedApplication, 'group':selectedGroup, 'year':selectedYear})
 			request.done(function(summary_data) {
 				if ("error" in summary_data){
 					$('#container').show();

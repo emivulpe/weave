@@ -736,6 +736,7 @@ def update_time_graph(request):
 	group_name=request.GET.get('group', None)
 	year = request.GET.get('year', None)		
 	student_id = request.GET.get('student', None)
+	print student_id, "STUDENT"
 	
 	if app_name is None or group_name is None or year is None:
 	    return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
@@ -751,6 +752,7 @@ def update_time_graph(request):
 		
 		if student_id is not None:
 			student = Student.objects.filter(student_id=student_id)[0]
+			print student
 	except IndexError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	
@@ -759,7 +761,9 @@ def update_time_graph(request):
 	usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group)
 	print usage_records,"records"
 	if student_id is not None:
-		usage_records = usage_records.filter(student=student)
+		usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group, student = student)
+	else:
+		usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group)
 	print usage_records,"records2"
 	if len(usage_records) == 0:
 		print "empty records"
@@ -802,9 +806,10 @@ def update_time_graph(request):
 				
 				# If student ID is none, assume an average result, else SUM everything
 				if student_id is None:
-				    time = records.aggregate(time = Avg('time_on_step'))
+					time = records.aggregate(time = Avg('time_on_step'))
 				else:
-				    time = records.aggregate(time = Sum('time_on_step'))
+					print "should be sum"
+					time = records.aggregate(time = Sum('time_on_step'))
 
 				revisited_steps_count=len(records.filter(direction="back"))
 				print time['time'] , "Time"
