@@ -72,7 +72,7 @@
 		<tr>
 			<th>Student ID</th>
 			<th>Total time (s)</th>
-			<th>Times revisited</th>
+			<th>Steps backwards</th>
 			<th>Last step</th>
 		</tr>
 	</table>
@@ -103,7 +103,7 @@
 		var app_questions_dict = {{app_questions_dict}}; // Mapping between an application and the questions for the application 
 		
 		var applications = {{application_names}}; // List of all the application names
-		
+		var selectedStatistics = "";
 		{% endautoescape %}
 			var chart_num=0; // uniquely identifies generated charts
 
@@ -382,7 +382,7 @@
 					},
 					
 					title: {
-						text: "",
+						text: selectedStatistics,
 					},
 					
 					subtitle: {
@@ -483,7 +483,8 @@
 					}
 				});
 				selectedGroup = document.getElementById("group_list").value; // Get the selected group
-				selectedOption = document.getElementById("statistics_options").value; 
+				selectedOption = document.getElementById("statistics_options").value;
+				selectedStatistics = "Application: " + selectedApplication + " Year: " + selectedYear + " Group: " + selectedGroup + " Data Type: " + selectedOption; 
 				$("#prev_step_button").css('visibility','hidden');
 				$("#next_step_button").css('visibility','hidden');
 				if(selectedOption=="summary_data"){
