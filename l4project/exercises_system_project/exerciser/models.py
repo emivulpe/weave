@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 # A class for applications
 class Application(models.Model):
 	name = models.CharField(max_length = 128, primary_key = True)
-	#layout = models.CharField(max_length = 128)
 
 	# Show it via application name
 	def __unicode__(self):
@@ -24,7 +23,7 @@ class DocumentType(models.Model):
 class FragmentType(models.Model):
 	name = models.CharField(max_length=128)
 	kind = models.CharField(max_length=128)
-	document_type = models.ForeignKey(DocumentType, blank=True, null=True)
+	document_type = models.ForeignKey(DocumentType, blank=True, null=True, unique = False)
 	
 	# Show it via fragment type name
 	def __unicode__(self):
@@ -37,7 +36,7 @@ class FragmentStyle(models.Model):
 	italic = models.BooleanField(default=False)
 	underlined = models.BooleanField(default=False)
 	font_size = models.SmallIntegerField(default=12)
-	type = models.ForeignKey(FragmentType, blank=True, null=True)
+	type = models.ForeignKey(FragmentType, blank=True, null=True, unique = False)
 	
 	# Prepare the fragment style in the form of css attributes
 	def __unicode__(self):
@@ -80,7 +79,7 @@ class Fragment(models.Model):
 	
 
 class Step(models.Model):
-	application = models.ForeignKey(Application)
+	application = models.ForeignKey(Application, unique = False)
 	order = models.IntegerField()
 
 	def __unicode__(self):
@@ -90,7 +89,7 @@ class Step(models.Model):
 		ordering = ['order']
 
 class Question(models.Model):
-	application = models.ForeignKey(Application)
+	application = models.ForeignKey(Application, unique = False)
 	step = models.ForeignKey(Step)
 	question_text = models.TextField()
 
@@ -101,10 +100,10 @@ class Question(models.Model):
 		return self.__unicode__()
 
 class Change(models.Model):
-	step = models.ForeignKey(Step)
-	fragment = models.ForeignKey(Fragment, blank=True, null=True)
-	question = models.ForeignKey(Question, blank=True, null=True)
-	document = models.ForeignKey(Document)
+	step = models.ForeignKey(Step, unique = False)
+	fragment = models.ForeignKey(Fragment, blank=True, null=True, unique = False)
+	question = models.ForeignKey(Question, blank=True, null=True, unique = False)
+	document = models.ForeignKey(Document, unique = False)
 	operation = models.CharField(max_length=128)
 
 	def getChanges(self):
@@ -134,7 +133,7 @@ class Change(models.Model):
 		return " ".join(("Document: ", self.document.name," | Step: ", str(self.step.order), " | Text: ",self.fragment.text, " | Operation:", self.operation ))
 
 class Explanation(models.Model):
-	step = models.ForeignKey(Step)
+	step = models.ForeignKey(Step, unique = False)
 	text = models.TextField()
 
 	def __unicode__(self):
@@ -142,7 +141,7 @@ class Explanation(models.Model):
 		
 
 class Option(models.Model):
-	question = models.ForeignKey(Question)
+	question = models.ForeignKey(Question, unique = False)
 	number = models.IntegerField()
 	content = models.CharField(max_length = 256)
 
@@ -152,8 +151,8 @@ class Option(models.Model):
 
 		
 class Panel(models.Model):
-	application = models.ForeignKey(Application)
-	document = models.ForeignKey(Document)
+	application = models.ForeignKey(Application, unique = False)
+	document = models.ForeignKey(Document, unique = False)
 	type = models.CharField(max_length = 128)
 	number = models.IntegerField()
 	
@@ -191,11 +190,11 @@ class Teacher(models.Model):
 		return " ".join((self.user.username ,str(self.can_analyse)))
 		
 class Group(models.Model):
-	teacher = models.ForeignKey(Teacher)
-	academic_year = models.ForeignKey(AcademicYear)
+	teacher = models.ForeignKey(Teacher, unique = False)
+	academic_year = models.ForeignKey(AcademicYear, unique = False)
 	name = models.CharField(max_length=100)
 	class Meta:
-		unique_together = ('academic_year', 'name',)
+		unique_together = ('academic_year', 'name','teacher')
 	def __unicode__(self):
 		return self.name
 	def __repr__(self):
@@ -203,23 +202,22 @@ class Group(models.Model):
 
 		
 class Student(models.Model):
-	teacher = models.ForeignKey(Teacher)
-	group = models.ForeignKey(Group)
+	teacher = models.ForeignKey(Teacher, unique = False)
+	group = models.ForeignKey(Group, unique = False)
 	student_id = models.CharField(max_length=2)
-	"""
-	def __unicode__(self):
-		return " ".join((" teacher: ",self.teacher.user.username," group: ",self.group.name, " name",self.student_id))
-	"""
+
 	def __unicode__(self):
 		return self.student_id
 	def __repr__(self):
 		return self.__unicode__()
+		
+		
 class UsageRecord(models.Model):
-	application = models.ForeignKey(Application)
-	teacher = models.ForeignKey(Teacher, blank=True, null=True)
-	group = models.ForeignKey(Group, blank=True, null=True)
-	student = models.ForeignKey(Student, blank=True, null=True)
-	step = models.ForeignKey(Step)
+	application = models.ForeignKey(Application, unique = False)
+	teacher = models.ForeignKey(Teacher, blank=True, null=True, unique = False)
+	group = models.ForeignKey(Group, blank=True, null=True, unique = False)
+	student = models.ForeignKey(Student, blank=True, null=True, unique = False)
+	step = models.ForeignKey(Step, unique = False)
 	session_id = models.CharField(max_length=100, blank=True, null=True)
 	time_on_step = models.FloatField(default=0)
 	direction = models.CharField(max_length=10)
@@ -247,17 +245,17 @@ class UsageRecord(models.Model):
 
 
 class QuestionRecord(models.Model):
-	application = models.ForeignKey(Application)
-	question = models.ForeignKey(Question)
-	teacher = models.ForeignKey(Teacher, blank=True, null=True)
-	group = models.ForeignKey(Group, blank=True, null=True)
-	student = models.ForeignKey(Student, blank=True, null=True)
+	application = models.ForeignKey(Application, unique = False)
+	question = models.ForeignKey(Question, unique = False)
+	teacher = models.ForeignKey(Teacher, blank=True, null=True, unique = False)
+	group = models.ForeignKey(Group, blank=True, null=True, unique = False)
+	student = models.ForeignKey(Student, blank=True, null=True, unique = False)
 	session_id = models.CharField(max_length=100, blank=True, null=True)
-	answer = models.ForeignKey(Option, blank=True, null=True) # TODO Maybe remove
+	answer = models.ForeignKey(Option, blank=True, null=True, unique = False)
 	answer_text=models.TextField()
 
 class SampleQuestionnaire(models.Model):
-	teacher=models.ForeignKey(Teacher, blank=True, null=True)
+	teacher=models.ForeignKey(Teacher, blank=True, null=True, unique = False)
 	FRESHMAN = 'FR'
 	SOPHOMORE = 'SO'
 	JUNIOR = 'JR'
