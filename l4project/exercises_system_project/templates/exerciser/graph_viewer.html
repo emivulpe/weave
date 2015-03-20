@@ -3,7 +3,7 @@
 {% block links %} 	
 	<link rel="stylesheet" type="text/css" href="{% static 'css/ui.dropdownchecklist.themeroller.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui-1.8.4.custom.css' %}" />
-	{% endblock %}
+{% endblock %}
 {% block style %}
 	<style>
 		#container{
@@ -84,18 +84,18 @@
 	<script src="{% static 'js/exporting.js' %}"></script>
 	<script src="{% static 'js/customEvents.js' %}"></script>
 
-<script src="http://code.highcharts.com/modules/data.js"></script>
+	<script src="http://code.highcharts.com/modules/data.js"></script>
 
 
-<!-- Additional files for the Highslide popup effect TODO download these --> 
-<script type="text/javascript" src="http://www.highcharts.com/media/com_demo/highslide-full.min.js"></script>
-<script type="text/javascript" src="http://www.highcharts.com/media/com_demo/highslide.config.js" charset="utf-8"></script>
-<script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/ui.dropdownchecklist-1.1-min.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="http://www.highcharts.com/media/com_demo/highslide.css" />
+	<!-- Additional files for the Highslide popup effect TODO download these --> 
+	<script type="text/javascript" src="http://www.highcharts.com/media/com_demo/highslide-full.min.js"></script>
+	<script type="text/javascript" src="http://www.highcharts.com/media/com_demo/highslide.config.js" charset="utf-8"></script>
+	<script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ui.dropdownchecklist-1.1-min.js' %}"></script>
+	<link rel="stylesheet" type="text/css" href="http://www.highcharts.com/media/com_demo/highslide.css" />
 
 	<script>
-	hs.zIndexCounter = 1000000;
+		hs.zIndexCounter = 1000000;
 	
 		// extract some relevant information from the context
 		{% autoescape off %}
@@ -106,16 +106,10 @@
 		
 		{% endautoescape %}
 			var chart_num=0; // uniquely identifies generated charts
-			
-			
-			/*
-				TODO Maybe refactor
-			*/
-			
+
 			var step=0; 
 			var maxStep=0;
-			
-			
+
 			function getNextStepData() {
 				
 				console.log(step);
@@ -132,15 +126,19 @@
 					var chartDetails={"xAxisTitle":"Students","yAxisTitle":"Time","seriesName":selectedApplication + "- Group " + selectedGroup,"chartType":"column","selectedOption":"class_steps","chartSubtitle":"Step " + step}
 					drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 				}
+				
 				if (step>=maxStep){
 					$("#next_step_button").css('visibility','hidden');
 				}
+				
 				else{
 					$("#next_step_button").css('visibility','visible');
 				}
+				
 				if (step>1){
 					$("#prev_step_button").css('visibility','visible');
 				}
+				
 				else{
 					$("#prev_step_button").css('visibility','hidden');
 				}
@@ -162,30 +160,28 @@
 					var chartDetails={xAxisTitle:"Students",yAxisTitle:"Time",seriesName:selectedApplication + "- Group " + selectedGroup,"chartType":"column",selectedOption:"class_steps","chartSubtitle":"Step " + step}
 					drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 				}
+				
 				if (step>=maxStep){
 					$("#next_step_button").css('visibility','hidden');
 				}
+				
 				else{
 					$("#next_step_button").css('visibility','visible');
 				}
+				
 				if (step>1){
 					$("#prev_step_button").css('visibility','visible');
 				}
+				
 				else{
 					$("#prev_step_button").css('visibility','hidden');
 				}
 			};
 			
 		
-		/*
-			ENDTODO
-		*/
-		
 			// Logic for handling selection of requested information
 			$('#statistics_options').on('change', function() {
-			
-				selected_option = document.getElementById("statistics_options").value;
-//				selectedApplication=$("#application").val();				
+				selected_option = document.getElementById("statistics_options").value;			
 				console.log("sel opt" + selected_option);
 				// Apply logic specific to the answers selection
 				if (this.value=="answers"){
@@ -195,16 +191,19 @@
 					$("#student_list").hide(); // Hide the selection for the students
 					$("#step_list").hide();
 				}
+				
 				else if (selected_option=="student_time"){
 					$("#student_list").show(); // Show the selection for the students
 					$("#question_list").hide(); // Hide the questions selection -no interest in being there
 					$("#step_list").hide();
 				}
+				
 				else if (selected_option=="class_steps"){
 					$("#student_list").hide(); // Show the selection for the students
 					$("#question_list").hide(); // Hide the questions selection -no interest in being there
 					$("#step_list").show();
-				}	
+				}
+				
 				// Apply logic specific for any other selection
 				else{
 					$( "#application" ).autocomplete('option', 'source', applications); // Change the autocomplete list to all applications
@@ -213,11 +212,16 @@
 					$("#step_list").hide();
 				}
 			});
+			
 			// Update the question selection to the questions for the selected application
-			$("#application").focus(function() {
-				$("#question_list").bind('mouseover',function(){addQuestions()});
-				$("#step_list").bind('mouseover',function(){addSteps()});
+			$("#application").mouseup(function() {
+				$("#application").bind('mouseout',function() {
+					$("#question_list").bind('mouseover',function(){addQuestions()});
+					$("#step_list").bind('mouseover',function(){addSteps()});
+					$("#application").unbind('mouseout');
+				});
 			});	
+			
 			// Update the student selection to the students for the selected academic year and group
 			$("#group_list").on('change',function() {
 				selectedGroup=document.getElementById("group_list").value;
@@ -228,15 +232,19 @@
 			
 			function seriesFormat(el,selectedOption){
 				console.log(selectedOption+"SEL OPTION SERIES");
+				
 				if (selectedOption == "time" || selectedOption=="student_time"){
 					return Highcharts.numberFormat(el.y,1) + ' s (' + el.point.revisited_count + ')' 
 				}
+				
 				else if(selectedOption == "answers"){
 					return el.y + ' times'
 				}
+				
 				else if (selectedOption == "class_steps"){
 					return Highcharts.numberFormat(el.y,1) + ' s'
 				}
+				
 				else{
 					return el.y
 				}
@@ -251,13 +259,16 @@
 						'Revisited: ' + el.point.revisited_count + ' times<br />' +
 						'Explanation: ' + el.point.explanation_start + '<br />';
 				}
+				
 				else if (selectedOption=="answers"){
 					return 'Times Chosen: ' + el.point.y + '<br/>' +
 							'Students: ' + el.point.students;
 				}
+				
 				else if (selectedOption=="class_steps"){
 					return "Time: " + Highcharts.numberFormat(el.point.y,1) + " s";
 				}
+				
 				else {
 					return el.point.y;
 				}
@@ -266,7 +277,6 @@
 				console.log("TREWTERTEgreagra " + url + selectedOption);
 				chartType=chartDetails["chartType"];
 				chartSubtitle=chartDetails["chartSubtitle"];
-				
 				var xAxisTitle=chartDetails["xAxisTitle"];
 				var yAxisTitle=chartDetails["yAxisTitle"];
 				var seriesName=chartDetails["seriesName"];
@@ -274,7 +284,6 @@
 				categories=[];
 				var request = $.get(url, selectedItems);
 				console.log(url+"url");
-				//alert(selectedOption);
 				request.done(function(selected_data) {
 					console.log(selected_data+"DAA");
 					if ("error" in selected_data){
@@ -284,6 +293,7 @@
 						$("#next_step_button").css('visibility','hidden');
 
 					}
+					
 					else if ("no_data" in selected_data){
 						$('#container').find('.highcharts-container').hide();
 						$('#container').html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>There are no statistics for the current selection</span><div>");
@@ -297,10 +307,12 @@
 							}
 						}
 					}
+					
 					else if ("open_question" in selected_data){
 						$('#' + chartContainer).find('.highcharts-container').hide();
 						$('#' + chartContainer).html("<div class='no_stats_info'><br\><br\><br\><br\><br\><br\><i class='fa fa-asterisk' style='color:red'></i><span style='color:red'>No information is currently shown for open questions. This feature will be addressed in a future version of WEAVE.</span><div>");
 					}
+					
 					else{
 					
 						if(Object.getOwnPropertyNames(selected_data).length != 0){
@@ -360,9 +372,9 @@
 					}
 				});
 			}
+			
+			
 			function drawChart(chartContainer,selectedOption,chartType, selectedApplication, selectedGroup,chartSubtitle,categories,xAxisTitle,yAxisTitle,formatter1Funct,clickFunct,clickFunctParameter,seriesName,chartData,formatter2Funct,selectedYear){
-				
-				console.log(chartSubtitle + "CHART SUBTITLEEEEEEEEE");
 				$('#'+chartContainer).highcharts({
 					chart: {
 						type: chartType
@@ -496,13 +508,8 @@
 						drawChartMerged(selectedItems,chartDetails,selectedOption,url,"container");
 					}
 					else if (selectedOption=="class_steps"){
-						//$("#prev_step_button").show();
-						//$("#next_step_button").css('visibility','visible');
 						url='/weave/update_class_steps_graph/';
 						step = parseInt(document.getElementById("step_list").value);
-						//if (step > 1){
-						//	$("#prev_step_button").css('visibility','visible');
-						//}
 						console.log("STEPPPPPPPPPPPPPP " + step);
 						var selectedItems={application:selectedApplication,group:selectedGroup,year:selectedYear,step:step};
 						var chartDetails={"xAxisTitle":"Students","yAxisTitle":"Time","seriesName":selectedApplication + "- Group " + selectedGroup,"chartType":"column","selectedOption":"class_steps","chartSubtitle":"Step " + step}
@@ -549,6 +556,7 @@
 			});
 			
 		}
+		
 		// Refactor make it like add students
 		// A function to populate the question selection with questions specific for the selected application
 		function addQuestions(){
@@ -556,7 +564,7 @@
 			$("#question_list").unbind('mouseover');
 			$("#question_info").prop("selected",true);
 			$("#question_list").children().not(':first').remove();
-			var request = $.get('/weave/get_application_questions/', {application:selectedApplication});
+			var request = $.get('/weave/get_application_questions/', {'application':selectedApplication});
 			console.log("request....");
 			request.done(function(questions) {
 				if (!("error" in questions)){
@@ -569,11 +577,12 @@
 				}
 			});
 		}
+		
 		// A function to populate the student selection with students specific for the selected group and year
 		function addStudents(selectedYear,selectedGroup){
 			$("#student_info").prop("selected",true);
 			$("#student_list").children().not(':first').remove();
-			var request = $.get('/weave/get_students/', {group:selectedGroup,year:selectedYear});
+			var request = $.get('/weave/get_students/', {'group':selectedGroup,'year':selectedYear});
 			console.log("request....");
 			request.done(function(students) {
 				console.log("request dones....");
@@ -589,6 +598,7 @@
 				}
 			});
 		}
+		
 		// A function to populate the student selection with students specific for the selected group and year
 		function addSteps(){
 			selectedApplication=$("#application").val();
@@ -607,74 +617,75 @@
 				}
 			});
 		}
-// Specify the list of applications for the autocomplete for the application selection
-$(function() {
-		$( "#application" ).autocomplete({minLength: 0,
-		  source: applications
-		}).focus(function() {
-		$(this).autocomplete("search", "");});
-});
-// Choose the available groups for the selected academic year
-$('.year').on('change', function() {
-	populateGroupList($(this).attr('id'),nextInDOM('.group', $(this)).attr('id'));
-});
-function populateGroupList(year_element,group_element) {
-	$("#"+group_element).children().not(':first').remove(); // Remove any previously shown groups
-	var selectedYear=$("#"+year_element).val(); // Get the selected year
-	
-	
-	var request = $.get('/weave/get_groups/', {year:selectedYear});
-	console.log("request....");
-	request.done(function(groups) { // Extract a list of the relevant groups
-		if (!("error" in groups)){
-			for (var group_index in groups){
-				var group = groups[group_index];
-				var option="<option value='" + group+"' >"+group + "</option>";
-				console.log(group);
-				$("#group_list").append(option);
-			}
+		
+		// Specify the list of applications for the autocomplete for the application selection
+		$(function() {
+				$( "#application" ).autocomplete({minLength: 0,
+				  source: applications
+				}).focus(function() {
+				$(this).autocomplete("search", "");});
+		});
+		// Choose the available groups for the selected academic year
+		$('.year').on('change', function() {
+			populateGroupList($(this).attr('id'),nextInDOM('.group', $(this)).attr('id'));
+		});
+		function populateGroupList(year_element,group_element) {
+			$("#"+group_element).children().not(':first').remove(); // Remove any previously shown groups
+			var selectedYear=$("#"+year_element).val(); // Get the selected year
+			
+			
+			var request = $.get('/weave/get_groups/', {year:selectedYear});
+			console.log("request....");
+			request.done(function(groups) { // Extract a list of the relevant groups
+				if (!("error" in groups)){
+					for (var group_index in groups){
+						var group = groups[group_index];
+						var option="<option value='" + group+"' >"+group + "</option>";
+						console.log(group);
+						$("#group_list").append(option);
+					}
+				}
+			});
 		}
-	});
-}
-//from here: http://stackoverflow.com/questions/12873027/jquery-forget-the-dom-structure-just-find-the-next-element-with-this-class/12873187#12873187
-function nextInDOM(_selector, _subject) {
-    var next = getNext(_subject);
-    while(next.length != 0) {
-        var found = searchFor(_selector, next);
-        if(found != null) return found;
-        next = getNext(next);
-    }
-    return null;
-}
-function getNext(_subject) {
-    if(_subject.next().length > 0) return _subject.next();
-    return getNext(_subject.parent());
-}
-function searchFor(_selector, _subject) {
-    if(_subject.is(_selector)) return _subject;
-    else {
-        var found = null;
-        _subject.children().each(function() {
-            found = searchFor(_selector, $(this));
-            if(found != null) return false;
-        });
-        return found;
-    }
-    return null; // will/should never get here
-}
-document.onkeydown = function(e) {
-    switch (e.keyCode) {
-        case 37:
-			if(step > 0){
-				getPrevStepData();
+		//from here: http://stackoverflow.com/questions/12873027/jquery-forget-the-dom-structure-just-find-the-next-element-with-this-class/12873187#12873187
+		function nextInDOM(_selector, _subject) {
+			var next = getNext(_subject);
+			while(next.length != 0) {
+				var found = searchFor(_selector, next);
+				if(found != null) return found;
+				next = getNext(next);
 			}
-            break;
-        case 39:
-			if(step < maxStep){ 
-				getNextStepData();
+			return null;
+		}
+		function getNext(_subject) {
+			if(_subject.next().length > 0) return _subject.next();
+			return getNext(_subject.parent());
+		}
+		function searchFor(_selector, _subject) {
+			if(_subject.is(_selector)) return _subject;
+			else {
+				var found = null;
+				_subject.children().each(function() {
+					found = searchFor(_selector, $(this));
+					if(found != null) return false;
+				});
+				return found;
 			}
-            break;
-    }
-};
+			return null; // will/should never get here
+		}
+		document.onkeydown = function(e) {
+			switch (e.keyCode) {
+				case 37:
+					if(step > 0){
+						getPrevStepData();
+					}
+					break;
+				case 39:
+					if(step < maxStep){ 
+						getNextStepData();
+					}
+					break;
+			}
+		};
 	</script>
 {% endblock %}
