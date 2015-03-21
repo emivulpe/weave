@@ -12,11 +12,11 @@ $("#btn_reset").css('visibility','hidden');
 var multipleChoiceQuestion=false;
 var textareaNum=0;
 
+
+
 function goToStep(direction) {
 
 	totalSteps = steps.length; // Total number of possible steps
-	
-	
 	$("*[id^='fragment_']").each(function() {
 	console.log($(this).css("background-color"));
 		if($(this).css("background-color") == "rgb(255, 224, 255)"){
@@ -44,12 +44,19 @@ function goToStep(direction) {
 			example_name : app_name
 		});
 		lastTime = now;*/
-		currentStep--;
+		if (currentStep < totalSteps){
+			currentStep--;
+		}
+		else {
+			currentStep = totalSteps-1;
+		}
 	}
 
 
-	if (currentStep == totalSteps-1 && direction == "next"){
+	if (currentStep == totalSteps && direction == "next"){
 		$("#btn_next").css('visibility','hidden');
+		$('#explanation').html("Example complete! Well done!");
+		//currentStep++;
 		//console.log("disabled");
 		//$('#btn_next').attr("disabled", true);
 	}
@@ -61,6 +68,20 @@ function goToStep(direction) {
 		$("#btn_next").css('visibility','visible');
 		$("#btn_reset").css('visibility','visible');
 	}
+	if(currentStep>0){
+			var now = new Date().getTime();			
+			$.post("/weave/log_info_db/",
+			{
+				'time' : (now - lastTime) / 1000,
+				'step' : currentStep,
+				'direction' : direction,
+				'csrfmiddlewaretoken' : csrftoken,
+				'example_name' : app_name
+			});
+			lastTime = now;
+			console.log("Current step " + currentStep);
+		}
+
 
 	if(currentStep >= 0 && currentStep < totalSteps){	
 		for (var i = 0; i < steps[currentStep].length; i++) {
@@ -83,19 +104,7 @@ function goToStep(direction) {
 			}
 			
 		}
-		if(currentStep>0){
-			var now = new Date().getTime();			
-			$.post("/weave/log_info_db/",
-			{
-				'time' : (now - lastTime) / 1000,
-				'step' : currentStep,
-				'direction' : direction,
-				'csrfmiddlewaretoken' : csrftoken,
-				'example_name' : app_name
-			});
-			lastTime = now;
-			console.log("Current step " + currentStep);
-		}
+		
 
 	
 		if (direction == "next" && explanation_dict[currentStep] == undefined) {
@@ -305,7 +314,7 @@ document.onkeydown = function(e) {
 			}
             break;
         case 39:
-			if(currentStep < totalSteps && $("#dialog").is(':hidden')){ //if the action is question that hasn't been asked yet, i.e. the explanation_dict is still empty for that step
+			if(currentStep <= totalSteps && $("#dialog").is(':hidden')){ //if the action is question that hasn't been asked yet, i.e. the explanation_dict is still empty for that step
 				goToStep("next");
 			}
             break;

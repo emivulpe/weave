@@ -148,7 +148,7 @@
 		$('#btn_prev_step').click(function() {
 			if(tutorialStep > 0){
 				tutorialStep--;
-				console.log("prev clicked");
+				//console.log("prev clicked");
 				goToTutorialStep(tutorialStep);
 			}
 		});
@@ -156,14 +156,14 @@
 		$('#btn_next_step').click(function() {
 			if (tutorialStep < 10){
 				tutorialStep++;
-				console.log("next clicked");
+				//console.log("next clicked");
 				goToTutorialStep(tutorialStep);
 			}
 		});
 
 		function goToTutorialStep(tutorialStep){
-			console.log("in tutorial step");
-			console.log(tutorialStep);
+			//console.log("in tutorial step");
+			//console.log(tutorialStep);
 			
 			switch(tutorialStep) {
 				case 0:
@@ -228,7 +228,7 @@
 		}
 
 
-		console.log("Teacher {{request.session.teacher}},{{applications}}");
+		//console.log("Teacher {{request.session.teacher}},{{applications}}");
 		var csrftoken = getCookie('csrftoken');
 		var teacher_name="";
 		var academic_year="";
@@ -247,13 +247,13 @@
 		
 		
 		function storeDetails(){
-			console.log("in store details ");
+			//console.log("in store details ");
 			$(".details").hide();
 			$("#application_list").show();
-			console.log("in store details" + academic_year);
+			//console.log("in store details" + academic_year);
 			window.location='/weave/save_session_ids/';
 			message = "You are using the application ";
-			console.log({{request.session.teacher}}+"TEST TEACHER");
+			//console.log({{request.session.teacher}}+"TEST TEACHER");
 			if(teacher_name != ""){
 				message += "registered with teacher id" + teacher_name;
 				
@@ -361,7 +361,7 @@
 			$("#unsuccess_message").text('');
 			//$("#back_button").hide();
 			var student = $("#student").val();
-			console.log("in student save ");
+			//console.log("in student save ");
 			var request = $.post("/weave/register_student_with_session/",
 			{
 				student : student,
@@ -371,7 +371,7 @@
 			request.done(function(success) {
 
 				if(success){
-					console.log("in student save " + success);
+					//console.log("in student save " + success);
 					student_name=student;
 					storeDetails();
 					$("#back_button").hide();
@@ -386,7 +386,7 @@
 		};
 		
 		function saveTeacher (){
-			console.log("in teacher save ");
+			//console.log("in teacher save ");
 			var teacher = $("#teacher").val();
 
 			$("#buttons").hide();
@@ -407,7 +407,7 @@
 				}
 				
 				else{
-					console.log("no such teacher");
+					//console.log("no such teacher");
 					$("#unsuccess_message").text("Sorry, but teacher ID " + teacher +  " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an id to work with, just press <No Teacher ID> to continue!");
 				}
 				
@@ -416,7 +416,7 @@
 		}
 		
 		function saveGroup(){
-			console.log("in group save ");
+			//console.log("in group save ");
 			$("#buttons").hide();
 			var group=document.getElementById("group_list").value;
 
@@ -436,7 +436,7 @@
 
 				}
 				else{
-					console.log("no such group");
+					//console.log("no such group");
 					$("#unsuccess_message").text("Sorry, but the group ID " + group + " is invalid. Please, try again, or ask your teacher for the correct id.  If your teacher didn’t give you an ID to work with, just press <No Group ID> to continue!");
 				}
 				$("#buttons").show();
@@ -445,10 +445,10 @@
 		
 
 		function saveYear(){
-			console.log("in year save ");
+			//console.log("in year save ");
 			$("#buttons").hide();
 			var year=document.getElementById("academic_year_select").value;
-			console.log(year + "year");
+			//console.log(year + "year");
 			var request = $.post("/weave/register_year_with_session/",
 			{
 			year : year,
@@ -477,7 +477,7 @@
 
 				}
 				else{
-					console.log("no such year");
+					//console.log("no such year");
 					$("#unsuccess_message").text("Sorry, but the year " + group + " is invalid. Please, try again, or click <No year> button to continue!!");
 				}
 				$("#buttons").show();

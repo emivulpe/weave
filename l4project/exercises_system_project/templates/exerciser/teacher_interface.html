@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block links %} 
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 
+	<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" />
 
 {% endblock %}
 {% block style %}
@@ -50,9 +50,7 @@
 							<td>
 								<input id = "delete_group"type="radio" name="action" value="delete"><label for="delete_group">Delete</label>
 							</td>
-							<td style="padding-left:10px;">
-								<i class="fa fa-question-circle" title="Select the corresponding option depending on whether you want to register a group, add students to a group or delete a group."></i>
-							</td>
+
 						</tr>
 						<tr>
 							<td style="text-align:right;padding:10px;">
@@ -150,7 +148,7 @@
 									<select id="group" class="group" style="width:100%;"></select>
 								</td>
 								<td style="padding-left:10px;">
-									<i class="fa fa-question-circle" title="Select the group you would like to see the student ids for."></i>
+									<i class="fa fa-question-circle" title="Select the group you would like to see ids for."></i>
 								</td>
 							</tr>
 							<tr>
@@ -211,7 +209,7 @@
 						</form><br/>
 						<div style="font-size: 12pt; font-weight: bold;"> 
 							<i class="fa fa-close success" style="color:red;"></i>
-							<strong class="success" style="color:red;">Your registration was unsuccessful. Please ensure that the passwords entered match. If they do, please try a different username!</strong>
+							<strong class="success" style="color:red;">Your registration was unsuccessful.You might have not entered the same password. If you are sure you have, please try again with a different username!</strong>
 						</div>
 					{% else %}
 						<h1>Register here!</h1><br />
@@ -349,8 +347,7 @@ This study adheres to the BPS ethical guidelines.</p>
 
 {% block javascripts %}
 
-	<script type="text/javascript" 
-src="{% static 'js/cookieAccessor.js' %}"></script>
+
 
 	<script>
 	
@@ -371,13 +368,13 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 			var selectedYear=$("#"+year_element).val();
 			
 			var request = $.get('/weave/get_groups/', {year:selectedYear});
-			console.log("request....");
+			//console.log("request....");
 			request.done(function(groups) { // Extract a list of the relevant groups
 				if ("error" in groups){
-					console.log("not good");
+					//console.log("not good");
 				}
 				else{
-					console.log("here");
+					//console.log("here");
 					if(year_element=="year"){
 						$(".existing_groups_list").empty();
 					}
@@ -388,7 +385,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 						for (var group_index in groups){
 							var group = groups[group_index];
 							var option="<option value='" + group+"' >"+group + "</option>";
-							console.log(group);
+							//console.log(group);
 							$("#"+group_element).append(option);
 							if(group_element=="group_entry"){
 								$(".existing_groups_list").append("<span class='appended_groups'>" + group + " </span>");
@@ -463,7 +460,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 		// Not sure if this does anything
 		$('button').each(function(){
 			$(this).closest('form').find("input[type=text], textarea").val("");
-			console.log("DA");
+			//console.log("DA");
 			$("#id_username").val('');
 		});
 		
@@ -546,7 +543,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 			}
 			else{
 				$("#success_message").before("<i class='fa fa-times success_icon' style='color:red'></i>");
-				$("#success_message").text(" The selected action is inappropriate for a group with name " + chosenGroup + "!");
+				$("#success_message").text(" There was a problem making the changes to group " + chosenGroup + "! Please ensure you are entering a valid group and number of students and try again!");
 				$("#success_message").css("color","red");
 			}
 			$("#success_dialog").dialog('open');
@@ -559,7 +556,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
 			var chosenYear=document.getElementById("year").value; // Get the chosen academic year
 			
 			
-			console.log(numStudents + chosenYear + "THISISIT");
+			//console.log(numStudents + chosenYear + "THISISIT");
 			
 			if (action == "register"){
 				registerGroup(chosenYear,numStudents);
@@ -608,7 +605,7 @@ src="{% static 'js/cookieAccessor.js' %}"></script>
         "Don't record data": function() {
           $( this ).dialog( "close" );
 		  $("#consent_value").val("");
-		  //console.log("disagree");
+		  ////console.log("disagree");
 		  //$('#user_form').trigger('submit', [true]);
 		  $("#user_form").submit();
 		  //location.reload(); // Reload the page to reflect the new changes
@@ -645,7 +642,7 @@ $(document).ready(function() {
 			$('#consent_dialog').dialog('open');
 		}
 		
-		console.log(consent_value);
+		////console.log(consent_value);
 		
 	});
 	/*$('#login_form').submit(function(e) {
@@ -656,13 +653,13 @@ $(document).ready(function() {
 			$('#consent_dialog').dialog('open');
 		}
 		
-		console.log(consent_value);
+		//console.log(consent_value);
 		
 	});
 	
 	$('#login_button').click(function () {
 		$('#questionnaire_dialog').dialog('open');
-        console.log("login button clicked");
+        //console.log("login button clicked");
     });*/
 	/*$('#register_user_button').click(function(e){
 		var consent_value = $('#consent_value').val();

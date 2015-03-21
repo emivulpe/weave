@@ -183,6 +183,7 @@ def student_group_list(request):
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	students=Student.objects.filter(teacher=teacher,group=group)
 	selected_year = selected_year +'/'+ str(int(selected_year)+1)
+	request.session['information_shown'] = True
 	return render_to_response('exerciser/groupSheet.html', {'students':students, 'group':group_name, 'year':selected_year}, context)
 	
 
@@ -198,7 +199,9 @@ def create_group(request):
 	except KeyError:
 		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
-
+	if num_students == '' or group_name == '':
+		return HttpResponse(simplejson.dumps(success), content_type="application/json")
+	
 	try:
 		user = User.objects.filter(username = teacher_username)[0]
 		teacher = Teacher.objects.filter(user=user)[0]
@@ -254,7 +257,8 @@ def update_group(request):
 	except KeyError:
 		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
-		
+	if num_students == '':
+		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	try:
 		user = User.objects.filter(username = teacher_username)[0]
 		teacher = Teacher.objects.filter(user=user)[0]
@@ -308,6 +312,11 @@ def save_session_ids(request):
 	print "saving..."
 	#return HttpResponse("{}",content_type = "application/json")
 	return HttpResponseRedirect('/weave/')
+	
+@requires_csrf_token
+def group_sheet_confirm(request):
+	request.session['information_seen']=True
+	return HttpResponse(simplejson.dumps(True),content_type = "application/json")
 
 ### Refactored. Checks added. Looks Fine ###
 @requires_csrf_token
@@ -558,7 +567,7 @@ def application(request, application_name_url):
 				expl = Explanation.objects.filter(step = step)
 				for explanation in expl:
 					explanations.append(json.dumps((explanation.text).replace('"',"&quot")))
-				
+			explanations.append("Example complete! Well done!")
 
 			context_dict['steps'] = json.dumps(stepChanges)
 			context_dict['explanations'] = explanations

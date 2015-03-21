@@ -30,7 +30,7 @@
 
 	
 {% block body_block %}
-	
+	{% if not request.session.information_seen %}
 	<div id="information_dialog" title="Group Sheet Information" style="margin:20px;display:none;">
 		<div id = "message">
 			<p>
@@ -42,7 +42,7 @@
 			<p> We do not keep your name or your pupils’ names on-line, so keep the mapping from name to student ID secure.  You can select the columns of student ID here and paste them into a spreadsheet, and keep a more secure copy of name to ID there, if you wish. </p>
 		</div>
 	</div>
-	
+	{% endif %}
 	
 	
 		<table id="student_table" border="1" style="width:90%;border: 1px solid black;border-collapse: collapse; margin: 0 auto; ">
@@ -66,9 +66,10 @@
 {% endblock %}
 
 {% block javascripts %}
-<script type="text/javascript" src="{% static 'js/jquery-2.1.1.js'  %}"></script>
-<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
 <script>
+	var csrftoken = getCookie('csrftoken');
+
     $( "#information_dialog" ).dialog({
 	width: $(window).width()*0.9,
       modal: true,
@@ -76,6 +77,7 @@
       buttons: {
         "OK": function() {
           $( this ).dialog( "close" );
+		  request = $.post("/weave/group_sheet_confirm/",{'csrfmiddlewaretoken' : csrftoken});
 		 // $("#consent_value").val("true");
 		  //$('#user_form').trigger('submit', [true]);
 		  //$("#user_form").submit();
