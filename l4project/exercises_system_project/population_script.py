@@ -276,16 +276,16 @@ if __name__ == '__main__':
 	populate_doc_types(doc_types_path)
 	
 	# Specify the file containing Documents
-	documents_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew2/Documents.xml')
+	documents_path = os.path.join(os.path.dirname(__file__), 'newexample/Documents.xml')
 	populate_documents(documents_path)
 
 	# Specify the file containing Applications
-	applications_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew2/Applications.xml')
+	applications_path = os.path.join(os.path.dirname(__file__), 'newexample/Applications.xml')
 	populate_applications(applications_path)
 	
 	
 	# Specify the file containing Processes
-	processes_path = os.path.join(os.path.dirname(__file__), 'cs1ctnew2/Processes.xml')
+	processes_path = os.path.join(os.path.dirname(__file__), 'newexample/Processes.xml')
 	populate_processes(processes_path)
 	
 	#Add an academic year
