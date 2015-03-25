@@ -15,9 +15,9 @@
 		</a>
 	{% endif %}
 {% endblock %}
-	
+{% block app_name %}WEAVE{% endblock %}
 {% block body_block %}
-
+	<h4 style = "text-align:center">Welcome to the Computing Science worked examples viewer!</h4>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 text-center">
@@ -69,6 +69,7 @@
 					</div>
 					</strong>
 				{% else %}
+					
 					<h1 class="details">Specify your details</h1>
 					<br>
 					<form id="detail_form" style=" margin-right: 5px; padding: 5px; font-size: 14pt; font-weight: bold;">
@@ -119,6 +120,7 @@
 						</table>
 
 					</form>
+					<strong> You may view worked examples without logging in, in which case press the ‘No teacher ID’ button, or you may have been given login details by your teacher - in which case, enter his/her teacher ID below, press Next and follow the instructions. </strong>
 					<br>
 					<strong id="unsuccess_message" style = "color:red"></strong>
 				{% endif %}
