@@ -8,7 +8,7 @@ from django.utils.importlib import import_module
 #imports for views
 from django.core.urlresolvers import reverse
 
-
+"""
 
 # models test
 class ApplicationTest(TestCase):
@@ -417,4 +417,78 @@ class RegisterStudentWithSessionTests(TestCase):
 		session.update({'teacher': 'test teacher','year':2014,'group':'test group'})
 		session.save()
 		response = c.post(reverse('register_student_with_session'), {'invalid key' : 'test student'})
+		self.assertEqual(response.status_code, 200)
+"""
+class GetGroupsForYearTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		
+
+	def test_get_groups_for_year_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+		response = c.post(reverse('get_groups_for_year'), {'year' : 2014})
+		self.assertEqual(response.status_code, 200)
+
+	def test_get_groups_for_year_invalid_teacher(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'invalid user'})
+		session.save()
+		response = c.post(reverse('get_groups_for_year'), {'year' : 2014})
+		self.assertEqual(response.status_code, 200)
+		
+		
+	def test_get_groups_for_year_invalid_year(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+		response = c.post(reverse('get_groups_for_year'), {'year' : 2015})
+		self.assertEqual(response.status_code, 200)
+		
+class RegisterYearWithSessionTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		
+
+	def test_register_year_with_session_valid(self):
+		c = Client()
+		response = c.post(reverse('register_year_with_session'), {'teacher' : 'test user', 'year' : 2014})
+		self.assertEqual(response.status_code, 200)
+
+	def test_register_year_with_session_invalid(self):
+		c = Client()
+	
+		response = c.post(reverse('register_year_with_session'), {'teacher' : 'invalid user', 'year' : 2014})
 		self.assertEqual(response.status_code, 200)
