@@ -8,7 +8,7 @@ from django.utils.importlib import import_module
 #imports for views
 from django.core.urlresolvers import reverse
 
-"""
+
 
 # models test
 class ApplicationTest(TestCase):
@@ -418,7 +418,7 @@ class RegisterStudentWithSessionTests(TestCase):
 		session.save()
 		response = c.post(reverse('register_student_with_session'), {'invalid key' : 'test student'})
 		self.assertEqual(response.status_code, 200)
-"""
+
 class GetGroupsForYearTests(TestCase):
 	def setUp(self):
 		# Setup Test User
@@ -442,6 +442,19 @@ class GetGroupsForYearTests(TestCase):
 		session.update({'teacher': 'test user'})
 		session.save()
 		response = c.post(reverse('get_groups_for_year'), {'year' : 2014})
+		self.assertEqual(response.status_code, 200)
+
+	def test_get_groups_for_year_invalid_key(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+		response = c.post(reverse('get_groups_for_year'), {'invalid key' : 2014})
 		self.assertEqual(response.status_code, 200)
 
 	def test_get_groups_for_year_invalid_teacher(self):
@@ -484,11 +497,115 @@ class RegisterYearWithSessionTests(TestCase):
 
 	def test_register_year_with_session_valid(self):
 		c = Client()
-		response = c.post(reverse('register_year_with_session'), {'teacher' : 'test user', 'year' : 2014})
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+		response = c.post(reverse('register_year_with_session'), {'year' : 2014})
+		self.assertEqual(response.status_code, 200)	
+	
+	def test_register_year_with_session_invalid_year(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+		response = c.post(reverse('register_year_with_session'), {'year' : 2015})
 		self.assertEqual(response.status_code, 200)
 
-	def test_register_year_with_session_invalid(self):
+	def test_register_year_with_session_invalid_key(self):
 		c = Client()
-	
-		response = c.post(reverse('register_year_with_session'), {'teacher' : 'invalid user', 'year' : 2014})
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user'})
+		session.save()
+		response = c.post(reverse('register_year_with_session'), {'invalid key' : 2014})
 		self.assertEqual(response.status_code, 200)
+		
+class ResetSessionTests(TestCase):
+		
+
+	def test_reset_session_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'teacher': 'test user', 'year' : 2014, 'group' : 'test group', 'student': 'test student', 'student_registered': True})
+		session.save()
+		response = c.post(reverse('reset_session'), {})
+		self.assertEqual(response.status_code, 302)
+		
+class DelSessionVariableTests(TestCase):
+		
+
+	def test_del_session_variable_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'delete me': 'delete me'})
+		session.save()
+		response = c.post(reverse('del_session_variable'), {'to_delete': 'delete me'})
+		self.assertEqual(response.status_code, 302)	
+		
+		
+	def test_del_session_variable_invalid_key(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'to_delete': 'delete me'})
+		session.save()
+		response = c.post(reverse('del_session_variable'), {'bad key': 'delete me'})
+		self.assertEqual(response.status_code, 302)	
+
+		
+class GetStudentsTests(TestCase):
+	
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+
+	def test_get_students_valid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		response = c.get(reverse('get_students'), {'group' : 'test group', 'year' : 2014})
+		self.assertEqual(response.status_code, 200)	
+		
+	def test_get_students_invalid(self):
+		c = Client()
+		response = c.get(reverse('get_students'), {'wrong key' : 'test group', 'year' : 2014})
+		self.assertEqual(response.status_code, 200)
+	def test_get_students_invalid_year(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		response = c.get(reverse('get_students'), {'group' : 'test group', 'year' : 2015})
+		self.assertEqual(response.status_code, 200)	
+	

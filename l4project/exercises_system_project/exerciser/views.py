@@ -598,7 +598,7 @@ def get_students(request):
 		teacher=Teacher.objects.filter(user=user)[0]
 		academic_year = AcademicYear.objects.filter(start=year)[0]
 		selected_group = Group.objects.filter(name = group_name,teacher=teacher,academic_year=academic_year)[0]
-	except InputError:
+	except IndexError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 
 	students=Student.objects.filter(group=selected_group)
