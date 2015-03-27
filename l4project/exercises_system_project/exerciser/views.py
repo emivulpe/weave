@@ -665,7 +665,7 @@ def get_steps(request):
 	steps = map(str,steps)
 	return HttpResponse(simplejson.dumps(steps), content_type="application/json")
 ### Refactored ###
-@login_required		
+#@login_required		
 def get_question_data(request):
 	print "in get question data"
 	app_name=request.GET.get('app_name',None)
@@ -678,6 +678,7 @@ def get_question_data(request):
 	if (app_name is None or year is None or group_name is None) or (step_num is None and question_text is None):
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_username = request.user
+	print teacher_username
 	try:
 		user=User.objects.filter(username=teacher_username)[0]
 		teacher=Teacher.objects.filter(user=user)[0]
@@ -1101,7 +1102,7 @@ def user_login(request):
 	return HttpResponseRedirect('/weave/teacher_interface')
 
 ### Refactored ###
-@login_required
+#@login_required
 def statistics(request):
 
 	context = RequestContext(request)
@@ -1133,7 +1134,7 @@ def statistics(request):
 # Use the login_required() decorator to ensure only those logged in can access the view.
 
 ### Looks OK ###
-@login_required
+#@login_required
 def user_logout(request):
     # Since we know the user is logged in, we can now just log them out.
     logout(request)

@@ -9,7 +9,7 @@ from django.utils.importlib import import_module
 from django.core.urlresolvers import reverse
 
 
-
+"""
 # models test
 class ApplicationTest(TestCase):
 
@@ -608,4 +608,99 @@ class GetStudentsTests(TestCase):
 		c.login(username='test user',password='password')
 		response = c.get(reverse('get_students'), {'group' : 'test group', 'year' : 2015})
 		self.assertEqual(response.status_code, 200)	
+
+"""
+class GetQuestionDataTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='test user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		student = Student.objects.get_or_create(teacher = teacher, group = group, student_id = 'test student')[0]
+		application = Application.objects.get_or_create(name = 'test application')[0]
+		step = Step.objects.get_or_create(application = application, order = 1)[0]
+		question = Question.objects.get_or_create(application = application, step = step, question_text = 'test question')[0]
+		
+
+	def test_get_question_data_missing_key(self):
+		print "here222"
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'student_registered': True})
+		session.save()
+		response = c.get(reverse('get_question_data'), {'year' : 2014, 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
+		print response.content
+		self.assertEqual(response.status_code, 200)
+		print "there222"
+		
+		
+	def test_get_question_data_invalid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'student_registered': True})
+		session.save()
+		response = c.get(reverse('get_question_data'), {'year' : 2014,'app_name' : 'invalid application', 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
+		self.assertEqual(response.status_code, 200)
+		
+		
+		
+class UpdateTimeGraphTests(TestCase):
+	def setUp(self):
+		# Setup Test User
+		user = User.objects.create_user(
+			username='user',
+			password='password'
+		)
+		teacher = Teacher.objects.get_or_create(user = user)[0]
+		print teacher
+		year = AcademicYear.objects.get_or_create(start = 2014)[0]
+		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
+		student = Student.objects.get_or_create(teacher = teacher, group = group, student_id = 'test student')[0]
+		application = Application.objects.get_or_create(name = 'test application')[0]
+		step = Step.objects.get_or_create(application = application, order = 1)[0]
+		question = Question.objects.get_or_create(application = application, step = step, question_text = 'test question')[0]
+		
+
+	def test_update_time_graph_valid(self):
+		print "here"
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'student_registered': True})
+		session.save()
+		response = c.get(reverse('update_time_graph'), {'year' : 2014,'app_name' : 'test application', 'group' : 'test group', 'student':'test student'})
+		self.assertEqual(response.status_code, 200)
+		print "there"
+		
+		
+	def test_update_time_graph_invalid(self):
+		c = Client()
+		c.login(username='test user',password='password')
+		engine = import_module(settings.SESSION_ENGINE)
+		store = engine.SessionStore()
+		store.save()  
+		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+		session = c.session
+		session.update({'student_registered': True})
+		session.save()
+		response = c.get(reverse('update_time_graph'), {'year' : 2014,'app_name' : 'test application', 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
+		self.assertEqual(response.status_code, 200)
 	
