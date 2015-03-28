@@ -78,7 +78,6 @@ def log_info_db(request):
 			year = request.session.get("year",None)
 			if group_name != None and year != None:
 				academic_year = AcademicYear.objects.filter(start = year)[0]
-				print academic_year, "AY TEST"
 				group = Group.objects.filter(teacher=teacher, academic_year = academic_year, name = group_name)
 				if len(group) > 0:
 					group=group[0]
@@ -112,7 +111,6 @@ def log_question_info_db(request):
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_name=request.session.get("teacher",None)
 	session_id = request.session.session_key
-	print "session", session_id
 	answer_text = answer_text.replace('<', '&lt')
 	answer_text = answer_text.replace('>', '&gt')
 	try:
@@ -171,7 +169,6 @@ def student_group_list(request):
 		teacher_username = request.GET['teacher']
 		selected_year = request.GET['year']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 
 	try:
@@ -180,7 +177,6 @@ def student_group_list(request):
 		year = AcademicYear.objects.filter(start=selected_year)[0]
 		group=Group.objects.filter(teacher=teacher,name=group_name,academic_year=year)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	students=Student.objects.filter(teacher=teacher,group=group)
 	selected_year = selected_year +'/'+ str(int(selected_year)+1)
@@ -202,7 +198,6 @@ def create_group(request):
 		selected_year = request.POST['year']
 		num_students = request.POST['num_students']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	if num_students == '' or group_name == '':
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
@@ -212,7 +207,6 @@ def create_group(request):
 		teacher = Teacher.objects.filter(user=user)[0]
 		year = AcademicYear.objects.filter(start=selected_year)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 
 	if len(Group.objects.filter(teacher=teacher,name=group_name,academic_year=year))==0:
@@ -236,7 +230,6 @@ def delete_group(request):
 		group_name = request.POST['group']
 		selected_year = request.POST['year']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	
 	try:
@@ -245,7 +238,6 @@ def delete_group(request):
 		year = AcademicYear.objects.filter(start=selected_year)[0]
 		group = Group.objects.filter(teacher=teacher,name=group_name,academic_year=year)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 
 	group.delete()
@@ -268,7 +260,6 @@ def update_group(request):
 		selected_year = request.POST['year']
 		num_students = request.POST['num_students']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	if num_students == '':
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
@@ -278,12 +269,10 @@ def update_group(request):
 		year = AcademicYear.objects.filter(start=selected_year)[0]
 		group = Group.objects.filter(teacher=teacher,name=group_name,academic_year=year)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 
 	create_student_ids(teacher,group,num_students)
 	success = True
-	print "created"
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 
@@ -301,7 +290,6 @@ def register_group_with_session(request):
 		year = request.session['year']
 		group_name = request.POST['group']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 		
 	try:
@@ -310,12 +298,10 @@ def register_group_with_session(request):
 		academic_year = AcademicYear.objects.filter(start=year)[0]
 		group = Group.objects.filter(teacher=teacher, academic_year = academic_year, name=group_name)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 		
 	request.session['group'] = group_name
 	success = True
-	print "success",success
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 	
@@ -348,18 +334,14 @@ def register_teacher_with_session(request):
 	try:
 		teacher_username = request.POST['teacher']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	try:
 		user = User.objects.filter(username=teacher_username)[0]
 		teacher = Teacher.objects.filter(user=user)[0]
-		print "teacher exists "
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	request.session['teacher'] = teacher_username
 	success = True
-	print "success",success
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 
@@ -376,7 +358,6 @@ def register_student_with_session(request):
 		year = request.session['year']
 		group_name = request.session['group']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 
 	try:
@@ -386,13 +367,10 @@ def register_student_with_session(request):
 		group=Group.objects.filter(teacher=teacher, academic_year = academic_year, name=group_name)[0]
 		student=Student.objects.filter(teacher=teacher,group=group,student_id=student_name)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 
-	print "student exists"
 	request.session['student'] = student_name
 	success = True
-	print "success",success
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 
@@ -404,17 +382,14 @@ def get_groups_for_year(request):
 		year = request.POST['year']
 		teacher_username = request.session['teacher']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps([]), content_type="application/json")
 	try:
 		user = User.objects.filter(username=teacher_username)[0]
 		teacher = Teacher.objects.filter(user=user)[0]
 		academic_year=AcademicYear.objects.filter(start=year)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps([]), content_type="application/json")
 	groups = Group.objects.filter(teacher=teacher,academic_year = academic_year)
-	print groups
 	groups = map(str, groups)
 	return HttpResponse(simplejson.dumps(groups), content_type="application/json")
 
@@ -429,17 +404,14 @@ def register_year_with_session(request):
 		year = request.POST['year']
 		teacher_username = request.session['teacher']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 
 	try:
 		academic_year=AcademicYear.objects.filter(start=year)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps(success), content_type="application/json")
 	request.session['year'] = year
 	success = True
-	print "success",success
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 	
 
@@ -449,22 +421,16 @@ def reset_session(request):
 	"""
 	A function to reset the session for a pupil.
 	"""
-	print "in reset"
 	if 'teacher' in request.session:
 		del request.session['teacher']
-		print "t"
 	if 'year' in request.session:
 		del request.session['year']
-		print "y"
 	if 'group' in request.session:
 		del request.session['group']
-		print "g"
 	if 'student' in request.session:
 		del request.session['student']
-		print "s"
 	if 'student_registered' in request.session:
 		del request.session['student_registered']
-		print "r"
 	
 	request.session.delete()
 	request.session.modified = True
@@ -482,7 +448,6 @@ def del_session_variable(request):
 		to_delete=request.POST['to_delete']
 	except KeyError:
 		return HttpResponseRedirect('/weave/')
-	print "in reset"
 	if to_delete in request.session:
 		del request.session[to_delete]
 
@@ -608,7 +573,6 @@ def get_largest_step(request):
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied in get groups'}), content_type="application/json")
 	application = Application.objects.filter(name = app_name)
 	total_steps=application.aggregate(num_steps=Count('step'))['num_steps']
-	print total_steps , "TOTAL STEPS"
 	return HttpResponse(simplejson.dumps({'steps':total_steps}), content_type="application/json")
 	
 
@@ -623,24 +587,18 @@ def get_groups(request):
 	try:
 		year = int(year)
 	except ValueError:
-		print "value error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied Value'}), content_type="application/json")
 	
 	teacher_username = request.user
 	try:
 		user=User.objects.filter(username=teacher_username)[0]
-		print user, "U"
 		teacher=Teacher.objects.filter(user=user)[0]
-		print teacher, "T"
 		academic_year = AcademicYear.objects.filter(start=year)[0]
-		print academic_year, "AY"
 	except IndexError:
-		print "Exception"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 
 	groups = Group.objects.filter(teacher=teacher,academic_year=academic_year)
 	groups = map(str,groups)
-	print groups, "G"
 	return HttpResponse(simplejson.dumps(groups), content_type="application/json")
 	
 
@@ -656,7 +614,6 @@ def get_steps(request):
 	try:
 		application = Application.objects.filter(name=app_name)[0]
 	except IndexError:
-		print "Exception"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 
 	steps = Step.objects.filter(application=application)
@@ -670,7 +627,6 @@ def get_question_data(request):
 	"""
 	A function to get the data recorded for answers of a question of a particular example. It only retrieves information about a selected group belonging to the logged in teacher.
 	"""
-	print "in get question data"
 	app_name=request.GET.get('app_name',None)
 	year=request.GET.get('year',None)
 	group_name=request.GET.get('group',None)
@@ -681,7 +637,6 @@ def get_question_data(request):
 	if (app_name is None or year is None or group_name is None) or (step_num is None and question_text is None):
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_username = request.user
-	print teacher_username
 	try:
 		user=User.objects.filter(username=teacher_username)[0]
 		teacher=Teacher.objects.filter(user=user)[0]
@@ -691,13 +646,11 @@ def get_question_data(request):
 		if question_text is not None:
 			question=Question.objects.filter(application=application,question_text=question_text)[0]
 		if student_id is not None:
-			print student_id
 			student=Student.objects.filter(teacher=teacher,group=group,student_id=student_id)[0]
 		if step_num is not None:
 			step=Step.objects.filter(application=application,order=step_num)[0]
 			question=Question.objects.filter(application=application,step=step)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 		
 
@@ -707,14 +660,9 @@ def get_question_data(request):
 	if len(all_options) == 0:
 		return HttpResponse(simplejson.dumps({'open_question':True}), content_type="application/json")
 	question_records = QuestionRecord.objects.filter(application=application, question=question, teacher=teacher,group=group)
-	print len(question_records),"QuestionRecordLen"
 	if student_id is not None:
-		print "not none"
-		print len(question_records)
 		question_records=question_records.filter(student=student)
-		print len(question_records),"QuestionRecordLen"
 	if len(question_records) == 0:
-		print "empty records"
 		selected_data["no_data"] = "True"
 		return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
 
@@ -725,15 +673,12 @@ def get_question_data(request):
 		times_chosen=len(records_for_option)
 		student_list=[]
 		if student_id is None:
-			print "student_id was none"
 			for record in records_for_option:
 				if record.student != None:
 					stud_id=record.student.student_id
-					print stud_id
 					if stud_id not in student_list:
 						student_list.append(stud_id)
 		else:
-			print "was not none"
 			student_list.append(student_id)
 		sd.append({option.content:times_chosen,'students':student_list})
 	selected_data['question']=quest_text
@@ -751,7 +696,6 @@ def update_time_graph(request):
 	group_name=request.GET.get('group', None)
 	year = request.GET.get('year', None)		
 	student_id = request.GET.get('student', None)
-	print student_id, "STUDENT"
 	
 	if app_name is None or group_name is None or year is None:
 	    return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
@@ -767,40 +711,29 @@ def update_time_graph(request):
 		
 		if student_id is not None:
 			student = Student.objects.filter(student_id=student_id)[0]
-			print student
 	except IndexError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	
-	print 2
 	selected_data={}
 	usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group)
-	print usage_records,"records"
 	if student_id is not None:
 		usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group, student = student)
 	else:
 		usage_records = UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=selected_group)
-	print usage_records,"records2"
 	if len(usage_records) == 0:
-		print "empty records"
 		selected_data["no_data"] = "True"
 		return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
 
-	print 4
 	question_steps=[]
 	app_questions=Question.objects.filter(application=selected_application)
 	for question in app_questions:
 		question_steps.append(question.step.order)
-	print 5
 	sd=[]
 	#### Getting averages ##########
 	steps = Step.objects.filter(application=selected_application)
 	num_steps = steps.aggregate(max = Max('order'))
-	print 6
 	if num_steps['max'] != None:
-		print 7
-		print num_steps['max'], "step num"
 		for step_num in range(1, num_steps['max']+1):
-			print step_num, " step num"
 			explanation_text=""
 			step=steps.filter(order=step_num)
 			if len(step)>0:
@@ -823,11 +756,9 @@ def update_time_graph(request):
 				if student_id is None:
 					time = records.aggregate(time = Avg('time_on_step'))
 				else:
-					print "should be sum"
 					time = records.aggregate(time = Sum('time_on_step'))
 
 				revisited_steps_count=len(records.filter(direction="back"))
-				print time['time'] , "Time"
 				sd.append({"y":time['time'],"revisited_count":revisited_steps_count,"explanation":explanation_text,"explanation_start":explanation_text_start})
 	if sd!=[]:
 		selected_data["data"]=sd
@@ -842,15 +773,10 @@ def update_class_steps_graph(request):
 	"""
 	try:
 		app_name=request.GET['application']
-		print app_name
 		group_name=request.GET['group']
-		print group_name
 		year = request.GET['year']
-		print year
 		step_num=request.GET['step']
-		print step_num
 	except KeyError:
-		print "error key"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	if step_num == 'NaN':
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
@@ -863,7 +789,6 @@ def update_class_steps_graph(request):
 		application=Application.objects.filter(name=app_name)[0]
 		step = Step.objects.filter(application=application, order = step_num)[0]
 	except IndexError:
-		print "error index"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	selected_data={}
 	sd=[]
@@ -875,7 +800,6 @@ def update_class_steps_graph(request):
 		if record.student != None:
 			sd.append({record.student.student_id:record.time_on_step})
 	selected_data["data"]=sd
-	print selected_data, "SELECTED DATA!!!!"
 
 	return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
 
@@ -890,7 +814,6 @@ def populate_summary_table(request):
 		academic_year=request.GET['year']
 		group_name=request.GET['group']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_username = request.user
 	try:
@@ -903,7 +826,6 @@ def populate_summary_table(request):
 		group = Group.objects.filter(name = group_name,teacher=teacher,academic_year=year)[0]
 
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	selected_data={}
 
@@ -913,14 +835,11 @@ def populate_summary_table(request):
 		student_id=student.student_id
 
 		student_records=UsageRecord.objects.filter(application=selected_application,teacher=teacher,group=group,student=student)
-		print student_records
 		last_step_reached=student_records.aggregate(last_step=Max('step_number'))
-		print last_step_reached, "Last step0"
 		if last_step_reached['last_step'] == None:
 			last_step_reached = 0
 		else:
 			last_step_reached = last_step_reached['last_step']
-			print last_step_reached, "Last step"
 
 		total_app_time=student_records.aggregate(time_on_step=Sum('time_on_step'))
 		if total_app_time['time_on_step'] == None:
@@ -929,10 +848,8 @@ def populate_summary_table(request):
 			total_app_time = total_app_time['time_on_step']
 
 		revisited_steps_count=student_records.filter(direction='back').aggregate(count_revisits=Count('id'))['count_revisits']
-		print student_id, last_step_reached,total_app_time,revisited_steps_count
 
 		selected_data[student_id]={'last_step':last_step_reached,'total_time':total_app_time,'num_steps_revisited':revisited_steps_count}
-	print selected_data
 	return HttpResponse(simplejson.dumps({"selected_data":selected_data,"total_steps":total_steps}), content_type="application/json")	
 
 def get_application_questions(request):
@@ -942,16 +859,13 @@ def get_application_questions(request):
 	try:
 		application = request.GET['application']
 	except KeyError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	try:
 		selected_application = Application.objects.filter(name=application)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	questions = Question.objects.filter(application=application)
 	questions = map(str, questions)
-	print questions, "questions"
 	return HttpResponse(simplejson.dumps(questions), content_type="application/json")
 
 
@@ -1008,7 +922,6 @@ def register(request):
 
 	# If it's a HTTP POST, we're interested in processing form data.
 	if request.method == 'POST':
-		print "was post"
 		# Attempt to grab information from the raw form information.
 		# Note that we make use of both UserForm and UserProfileForm.
 		user_form = UserForm(data=request.POST)
@@ -1019,7 +932,6 @@ def register(request):
 			try:
 				user = user_form.save()
 			except ValueError:
-				print "VALUE ERROR"
 				pass
 			# Now we hash the password with the set_password method.
 			# Once hashed, we can update the user object.
@@ -1030,15 +942,11 @@ def register(request):
 			try:
 				can_analyse=bool(request.POST['can_analyse'])
 				teacher.can_analyse=can_analyse
-				print "can ",can_analyse,request.POST['can_analyse']
 			except KeyError:
-				print "KeyERROR"
 				pass
 			except ValueError:
-				print "VALUE ERROR"
 				pass
 			teacher.save()
-			print teacher,"teacher"
 
 			# Update our variable to tell the template registration was successful.
 			registered = True
@@ -1049,7 +957,6 @@ def register(request):
 		else:
 			print user_form.errors , group_form.errors
 
-	print registered,"registered"
 	request.session['registered'] = registered
 	# Render the template depending on the context.
 	return HttpResponseRedirect('/weave/teacher_interface')
@@ -1106,7 +1013,6 @@ def statistics(request):
 		user = User.objects.filter(username=teacher_username)[0]
 		teacher = Teacher.objects.filter (user=user)[0]
 	except IndexError:
-		print "error"
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	applications = Application.objects.all();
 	academic_years=AcademicYear.objects.all()
