@@ -9,3 +9,21 @@
 	font-size: 12pt;
 	font-weight: bold;
 }
+.brand-heading{
+	font-size: 36pt;
+}
+
+.success{
+	color:green;
+}
+.ui-dialog-titlebar-close{
+    display: none;
+}
+.ui-front {
+    z-index:1000000;
+
+}
+.ui-dialog {
+    margin:50px;
+
+}

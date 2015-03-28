@@ -58,8 +58,7 @@ class Document(models.Model):
 	id = models.CharField(max_length=128,unique=True,primary_key=True)
 	document_type = models.ForeignKey(DocumentType, blank=True, null=True)
 	name = models.CharField(max_length=128)
-	#fixOrder = models.BooleanField()
-
+	
 	# Show if via the document name
 	def __unicode__(self):
 		return self.name
@@ -253,27 +252,3 @@ class QuestionRecord(models.Model):
 	session_id = models.CharField(max_length=100, blank=True, null=True)
 	answer = models.ForeignKey(Option, blank=True, null=True, unique = False)
 	answer_text=models.TextField()
-
-class SampleQuestionnaire(models.Model):
-	teacher=models.ForeignKey(Teacher, blank=True, null=True, unique = False)
-	FRESHMAN = 'FR'
-	SOPHOMORE = 'SO'
-	JUNIOR = 'JR'
-	SENIOR = 'SR'
-	YEAR_IN_SCHOOL_CHOICES = (
-		(FRESHMAN, 'Freshman'),
-		(SOPHOMORE, 'Sophomore'),
-		(JUNIOR, 'Junior'),
-		(SENIOR, 'Senior'),
-	)
-	year_in_school = models.CharField(max_length=2,
-										choices=YEAR_IN_SCHOOL_CHOICES,
-										default=FRESHMAN)
-	year_in_school2 = models.CharField(max_length=2,
-										choices=YEAR_IN_SCHOOL_CHOICES,
-										default=SENIOR)
-	school=models.CharField(max_length=100)
-	bool=models.BooleanField()
-	comment=models.TextField()
-	
-

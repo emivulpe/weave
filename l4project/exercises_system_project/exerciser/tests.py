@@ -617,6 +617,7 @@ class GetQuestionDataTests(TestCase):
 			username='test user',
 			password='password'
 		)
+		self.c = Client()
 		teacher = Teacher.objects.get_or_create(user = user)[0]
 		year = AcademicYear.objects.get_or_create(start = 2014)[0]
 		group = Group.objects.get_or_create(teacher = teacher, academic_year = year, name = 'test group')[0]
@@ -628,32 +629,16 @@ class GetQuestionDataTests(TestCase):
 
 	def test_get_question_data_missing_key(self):
 		print "here222"
-		c = Client()
-		c.login(username='test user',password='password')
-		engine = import_module(settings.SESSION_ENGINE)
-		store = engine.SessionStore()
-		store.save()  
-		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
-		session = c.session
-		session.update({'student_registered': True})
-		session.save()
-		response = c.get(reverse('get_question_data'), {'year' : 2014, 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
+		self.c.login(username='test user',password='password')
+		response = self.c.get(reverse('get_question_data'), {'year' : 2014, 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
 		print response.content
 		self.assertEqual(response.status_code, 200)
 		print "there222"
 		
 		
 	def test_get_question_data_invalid(self):
-		c = Client()
-		c.login(username='test user',password='password')
-		engine = import_module(settings.SESSION_ENGINE)
-		store = engine.SessionStore()
-		store.save()  
-		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
-		session = c.session
-		session.update({'student_registered': True})
-		session.save()
-		response = c.get(reverse('get_question_data'), {'year' : 2014,'app_name' : 'invalid application', 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
+		self.c.login(username='test user',password='password')
+		response = self.c.get(reverse('get_question_data'), {'year' : 2014,'app_name' : 'invalid application', 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
 		self.assertEqual(response.status_code, 200)
 		
 		
@@ -665,6 +650,7 @@ class UpdateTimeGraphTests(TestCase):
 			username='user',
 			password='password'
 		)
+		self.c = Client()
 		teacher = Teacher.objects.get_or_create(user = user)[0]
 		print teacher
 		year = AcademicYear.objects.get_or_create(start = 2014)[0]
@@ -677,30 +663,16 @@ class UpdateTimeGraphTests(TestCase):
 
 	def test_update_time_graph_valid(self):
 		print "here"
-		c = Client()
-		c.login(username='test user',password='password')
-		engine = import_module(settings.SESSION_ENGINE)
-		store = engine.SessionStore()
-		store.save()  
-		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
-		session = c.session
-		session.update({'student_registered': True})
-		session.save()
-		response = c.get(reverse('update_time_graph'), {'year' : 2014,'app_name' : 'test application', 'group' : 'test group', 'student':'test student'})
+		self.c.login(username='test user',password='password')
+		
+		response = self.c.get(reverse('update_time_graph'), {'year' : 2014,'app_name' : 'test application', 'group' : 'test group', 'student':'test student'})
 		self.assertEqual(response.status_code, 200)
 		print "there"
 		
 		
 	def test_update_time_graph_invalid(self):
-		c = Client()
-		c.login(username='test user',password='password')
-		engine = import_module(settings.SESSION_ENGINE)
-		store = engine.SessionStore()
-		store.save()  
-		c.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
-		session = c.session
-		session.update({'student_registered': True})
-		session.save()
-		response = c.get(reverse('update_time_graph'), {'year' : 2014,'app_name' : 'test application', 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
+		
+		self.c.login(username='test user',password='password')
+		response = self.c.get(reverse('update_time_graph'), {'year' : 2014,'app_name' : 'test application', 'group' : 'test group', 'step' : 1, 'question' : 'test question', 'student':'test student'})
 		self.assertEqual(response.status_code, 200)
 	

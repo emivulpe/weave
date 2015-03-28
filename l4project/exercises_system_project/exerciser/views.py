@@ -1,7 +1,7 @@
 from django.template import RequestContext
 from django.shortcuts import render
 from django.shortcuts import render_to_response
-from exerciser.models import Application, Panel, Document, Change, Step, Explanation, UsageRecord, QuestionRecord, Group, Teacher, Question, Option, Student, AcademicYear, SampleQuestionnaire
+from exerciser.models import Application, Panel, Document, Change, Step, Explanation, UsageRecord, QuestionRecord, Group, Teacher, Question, Option, Student, AcademicYear
 import json 
 import simplejson 
 import datetime
@@ -10,7 +10,7 @@ import random
 from random import randint
 from django.views.decorators.csrf import requires_csrf_token
 import django.conf as conf
-from exerciser.forms import UserForm, SampleQuestionnaireForm
+from exerciser.forms import UserForm
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -21,8 +21,11 @@ from django.db.models import Avg
 from django.db.models import Count, Max, Sum
 
 
-### Refactored ###
+
 def create_student_ids(teacher,group,number_students_needed):
+	"""
+	Given the number of students required for a group, generate that many unique student ids.
+	"""
 	created=0
 	ids=[]
 	while (created < int(number_students_needed)):
@@ -34,12 +37,13 @@ def create_student_ids(teacher,group,number_students_needed):
 			student.save()
 			ids.append(id)
 			created += 1
-	print ids,"IDS"
 
 
-### Refactored + TODO ###
 @requires_csrf_token
 def log_info_db(request):
+	""" 
+	This method logs the time spent on a step, when the user moves forwards or backwards to the next/previous step.
+	"""
 	try:
 		time_on_step = request.POST['time']
 		current_step = int(request.POST['step'])
@@ -48,10 +52,7 @@ def log_info_db(request):
 	except KeyError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	session_id = request.session.session_key
-	print "session", session_id
 
-	print current_step, "CUR STER"
-	print direction, "DIR"
 	if direction == "back":
 		current_step = int(current_step) + 1
 
@@ -65,7 +66,6 @@ def log_info_db(request):
 	record = UsageRecord(application = application, session_id = session_id, time_on_step = time_on_step, step = step, direction = direction)
 	
 	teacher_name=request.session.get("teacher",None)
-	print teacher_name
 	if teacher_name != None:
 	
 		user=User.objects.filter(username=teacher_name)
@@ -96,10 +96,13 @@ def log_info_db(request):
 
 	
 	
-###### Similar to the other log. Refactor. Refactored + TODO ############
+
 @requires_csrf_token
 def log_question_info_db(request):
-
+	"""
+	This method stores the answer chosen for a question at a particular step.
+	"""
+	
 	try:
 		time_on_question = request.POST['time']
 		current_step = request.POST['step']
@@ -109,7 +112,6 @@ def log_question_info_db(request):
 	except KeyError:
 		return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 	teacher_name=request.session.get("teacher",None)
-	#session_id = request.session.get("session_key","default session")
 	session_id = request.session.session_key
 	print "session", session_id
 	answer_text = answer_text.replace('<', '&lt')#
@@ -157,13 +159,13 @@ def log_question_info_db(request):
 								question_record.student = student
 	usage_record.save()
 	question_record.save()
-	print("test success")
 	return HttpResponse("{}",content_type = "application/json")
 	
 
-### Refactored Error handling well. Tested. Works ###
 def student_group_list(request):
-
+	""" 
+	This method retrieves the list of students for a particular group.
+	"""
 	context = RequestContext(request)
 	try:
 		group_name = request.GET['group']
@@ -184,12 +186,16 @@ def student_group_list(request):
 	students=Student.objects.filter(teacher=teacher,group=group)
 	selected_year = selected_year +'/'+ str(int(selected_year)+1)
 	request.session['information_shown'] = True
-	return render_to_response('exerciser/groupSheet.html', {'students':students, 'group':group_name, 'year':selected_year}, context)
+	return render_to_response('exerciser/group_sheet.html', {'students':students, 'group':group_name, 'year':selected_year}, context)
 	
 
-### similar to update group. Refactor. Refactored ###
+
 @requires_csrf_token
 def create_group(request):
+	"""
+	This method creates a group for a particular teacher and year with the specified number of students.
+	"""
+	
 	success = False
 	try:
 		teacher_username = request.POST['teacher']
@@ -218,9 +224,13 @@ def create_group(request):
 
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 	
-### Refactored. Checks added. Looks Fine ###
+
+	
 @requires_csrf_token
 def delete_group(request):
+	"""
+	This method deletes the group the teacher selected to delete.
+	"""
 	success = False
 	try:
 		teacher_username = request.POST['teacher']
@@ -245,9 +255,13 @@ def delete_group(request):
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 
-### Refactored. Checks added. Looks Fine ###
+
 @requires_csrf_token
 def update_group(request):
+	"""
+	This method adds the required number of students to a selected group
+	"""
+	
 	success = False
 	try:
 		group_name = request.POST['group']
@@ -276,10 +290,12 @@ def update_group(request):
 
 
 
-### Refactored. Checks added. Looks Fine ###
 @requires_csrf_token
 def register_group_with_session(request):
-	print "in reg group"
+	"""
+	This method handles registration of a group for a particular teacher.
+	"""
+	
 	success=False
 	try:
 		teacher_username = request.session['teacher']
@@ -304,21 +320,26 @@ def register_group_with_session(request):
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 	
-### Refactored. Do I really need it? ###
+
 @requires_csrf_token
 def save_session_ids(request):
-	print "in save"
+	""" 
+	This method saves the session ids.
+	"""
+	
 	request.session['student_registered']=True
-	print "saving..."
-	#return HttpResponse("{}",content_type = "application/json")
 	return HttpResponseRedirect('/weave/')
 	
 @requires_csrf_token
 def group_sheet_confirm(request):
+	"""
+	This method ensures that the information shown to the teachers explaining that they need to print the table of the students is shown once in a session only.
+	"""
+	
 	request.session['information_seen']=True
 	return HttpResponse(simplejson.dumps(True),content_type = "application/json")
 
-### Refactored. Checks added. Looks Fine ###
+
 @requires_csrf_token
 def register_teacher_with_session(request):
 	print "in reg teacher"
@@ -481,6 +502,7 @@ def index(request):
 
 
 ### Refactored ###
+"""
 @requires_csrf_token
 def submit_questionnaire(request):
 	print "in submit questionnaire"
@@ -524,9 +546,9 @@ def submit_questionnaire(request):
 		return HttpResponseRedirect('/weave/teacher_interface')
 	
 	# Skipped is in; this should be an AJAX call
-	request.session['questionnaire_asked'] = True
+	#request.session['questionnaire_asked'] = True
 	return HttpResponse('{}', content_type='application/json')
-
+"""
 
 ### Refactored ###
 def application(request, application_name_url):
@@ -970,9 +992,9 @@ def teacher_interface(request):
 			groups[academic_year.start]= group_names
 
 
-	questionnaire_form = SampleQuestionnaireForm()
+	#questionnaire_form = SampleQuestionnaireForm()
 
-	context_dict = {'applications' : application_list,'user_form': user_form, 'groups': groups,'academic_years':academic_years,'questionnaire_form':questionnaire_form}
+	context_dict = {'applications' : application_list,'user_form': user_form, 'groups': groups,'academic_years':academic_years}
 	
 	
 	# Return a rendered response to send to the client.
@@ -1043,6 +1065,7 @@ def register(request):
 	
 
 ### Looks OK ###
+"""
 def questionnaire(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -1060,7 +1083,7 @@ def questionnaire(request):
         form = SampleQuestionnaireForm()
 
     return render(request, 'exerciser/questionnaire.html', {'form': form})
-	
+"""
 	
 ### Looks OK ###
 def user_login(request):
@@ -1091,9 +1114,6 @@ def user_login(request):
 				successful_login = True
 				try:
 					teacher=Teacher.objects.filter(user=user)[0]
-					questionnaire=SampleQuestionnaire.objects.filter(teacher=teacher)
-					if len(questionnaire)>0:
-						request.session['questionnaire_asked'] = True
 				except IndexError:
 					pass
 					

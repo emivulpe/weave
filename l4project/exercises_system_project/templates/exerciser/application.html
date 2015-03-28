@@ -1,70 +1,6 @@
 {% extends 'exerciser/base.html' %}
 {% load static %}
-{% block style %}
-html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-}
-	#outer_panel{
-
-		margin:5px;
-	}
-
-	#panel_container{
-		height:100%;
-		width:100%;
-	}
-
-	#panel_row{
-		overflow:hidden;
-		text-align:left;
-		width : {{panel_size}}%;
-		height:100%;
-		border:1px solid black;
-	}
-
-	.fragment{
-		margin : 2px"
-	}
-
-	#explanation_row{
-		margin:5px;
-		height : 30%;
-	}
-
-	#explanation_container{
-		height : 100%;
-	}
-
-	#north{
-		z-index: 90;
-	}
-
-	.question{
-		padding: 0px 10px 0px 10px;
-	}
-
-	#question_submit{
-		text-align: center;
-	}
-
-	#question_dialogue{
-		width: 100%;
-		border: 0px;
-	}
-	.caret{
-		color:gray;
-	}
-	.centered {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	}
-
-{% endblock %}
-
-
+{% block links %}<link rel="stylesheet" href="{% static 'css/applications.css' %}" />{% endblock %}
 {% block app_name %}{{application_name}}{% endblock %}
 {% block app_controls %}
 	<li><a id="btn_prev" href="#" style="top: 2px; visibility:hidden;"><i class="fa fa-step-backward fa-lg landing-icon fa"></i>&nbsp;Previous</a></li>
@@ -157,50 +93,6 @@ html, body {
 		var app_name = "{{application_name}}";
 		{% endautoescape %}
 
-		$(function($) {
-			$( ".resizable").resizable();
-			$( "#dialog" ).draggable();
-			$("#panel_container").height($("#interface").height()*0.7);
-			$("#explanation_container").height($("#interface").height()*0.3);
-		});
-
-		$("#explanation_container").bind('mouseup', function(e) {
-			$("#panel_container").height($("#interface").height()-$("#explanation_container").height());
-		});
-		
-		
-
-		
-		
-		
-		$("#explanation_container").bind('resize', function(e) {
-			$("#panel_container").height($("#interface").height()-$("#explanation_container").height());
-			//$("#panel_container").css("overflow","auto");
-			console.log("expl ".concat($("#explanation_container").height()));
-			console.log("interface ".concat($("#interface").height()));
-			console.log("test ".concat($("#explanation_container").height() / $("#interface").height() * 100));
-		});
-		
-		var explanationMaxHeight = 0.6 * $("#interface").height();
-		$("#explanation_container").resizable({
-			maxHeight: explanationMaxHeight,
-			handles: {n: document.getElementById("north"),
-			onResize:onSampleResized}
-		});
-		
-		var onSampleResized = function(e){
-			console.log("Resised");
-			
-		};
-		
-		$("#panel_container").colResizable({
-			liveDrag:true, 
-			gripInnerHtml:"<div class='grip'></div>", 
-			draggingClass:"dragging" 
-			//onResize:onSampleResized
-			});
-			
-			
-		
 	</script>
+	<script type="text/javascript" src="{% static 'js/applications.js' %}"></script>
 {% endblock %}

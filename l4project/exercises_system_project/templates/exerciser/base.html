@@ -8,19 +8,9 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.css' %}" />
 		<link rel="stylesheet" href="{% static 'font-awesome-4.2.0/css/font-awesome.min.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
-		
-		<title>Exerciser- {% block title %}Exercise!{% endblock %}</title>
-		<style>
-		#interface{
-			width: 100%;
-			height:95vh;
-			position:relative;
-			padding-top:55px;
-		}
-		</style>
-		
+		{% block links %}{% endblock %}
+		<title>WEAVE- {% block title %}Worked Examples Viewer{% endblock %}</title>
 		<style>{% block style %}{% endblock %}</style>
-
 	</head>
 
 	<body>
@@ -76,48 +66,19 @@
 		<!-- /.container -->
 	</nav>
 
-	<div id = "interface">
+	<div id = "interface" style="width: 100%; height:95vh; position:relative; padding-top:55px;">
 		{% block body_block %}{% endblock %}
 	</div>
 
 	<script type="text/javascript" src="{% static 'js/jquery-2.1.1.js'  %}"></script>
 	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/base.js' %}"></script>
 	<script>
 
 		if ("{{request.session.student_registered}}" == ""){
 			$("#application_list").hide();
 		}
-		$("#interface").css("padding-top",$("#navigation_bar").height()+5);
-		
-		$( window ).resize(function() {
-			var navHeight = $("#navigation_bar").height();
-			console.log(navHeight);
-			$("#interface").css("padding-top",navHeight+5);
-			//$("#interface").css("height",$(window).height()-navHeight-1);
-		});
-$(document).ready(function() {
 
-	$('.navbar-collapse').on('show.bs.dropdown', function () {
-		setTimeout(function() {
-			$('#application_text').focus();
-			$('#application_text').val("");
-		}, 50);
-		
-		$('#application_text').blur(function() {
-			$('#application_text').val("Select Application...");
-		});
-		
-	$('#application_text').keyup(function(){
-	   var valThis = $(this).val().toLowerCase();
-		$('#application_list>li').each(function(){
-		 var text = $(this).text().toLowerCase();
-			(text.indexOf(valThis) == 0) ? $(this).show() : $(this).hide();            
-	   });
-	});
-})
-
-
-});
 		
 	</script>
 		
