@@ -76,7 +76,7 @@ class Fragment(models.Model):
 	def __unicode__(self):
 		return self.text
 	
-
+# A class for the steps
 class Step(models.Model):
 	application = models.ForeignKey(Application, unique = False)
 	order = models.IntegerField()
@@ -86,7 +86,8 @@ class Step(models.Model):
 
 	class Meta:
 		ordering = ['order']
-
+		
+# A class for the questions
 class Question(models.Model):
 	application = models.ForeignKey(Application, unique = False)
 	step = models.ForeignKey(Step)
@@ -97,7 +98,8 @@ class Question(models.Model):
 
 	def __repr__(self):
 		return self.__unicode__()
-
+		
+# A class for the changes at each step
 class Change(models.Model):
 	step = models.ForeignKey(Step, unique = False)
 	fragment = models.ForeignKey(Fragment, blank=True, null=True, unique = False)
@@ -131,6 +133,7 @@ class Change(models.Model):
 	def __unicode__(self):
 		return " ".join(("Document: ", self.document.name," | Step: ", str(self.step.order), " | Text: ",self.fragment.text, " | Operation:", self.operation ))
 
+# A class for the explanations at the steps
 class Explanation(models.Model):
 	step = models.ForeignKey(Step, unique = False)
 	text = models.TextField()
@@ -138,7 +141,8 @@ class Explanation(models.Model):
 	def __unicode__(self):
 		return self.text
 		
-
+		
+# A class for the options to questions
 class Option(models.Model):
 	question = models.ForeignKey(Question, unique = False)
 	number = models.IntegerField()
@@ -148,15 +152,13 @@ class Option(models.Model):
 	def __unicode__(self):
 		return "".join(("Option: ", str(self.number), ". ", self.content))
 
-		
+
+# A class for the panels storing the documents for the examples
 class Panel(models.Model):
 	application = models.ForeignKey(Application, unique = False)
 	document = models.ForeignKey(Document, unique = False)
 	type = models.CharField(max_length = 128)
 	number = models.IntegerField()
-	
-	
-	
 	
 	def __init__(self, *args, **kwargs):
 		super(Panel, self).__init__(*args, **kwargs)
@@ -170,24 +172,27 @@ class Panel(models.Model):
 		mappings = []
 		for fragment in Fragment.objects.filter(document = self.document):
 			index = fragment.order
-			mappings.insert(index,{fragment.text : 'show'}) #should be hide!!!
+			mappings.insert(index,{fragment.text : 'show'}) 
 		return mappings
 	def getFragments(self):
 		return Fragment.objects.filter(document = self.document)
 
+# A class for the academic years
 class AcademicYear(models.Model):
 	start = models.IntegerField(primary_key=True)
 	
 	def __unicode__(self):
 		return str(self.start)
-		
+
+# A class for the teachers
 class Teacher(models.Model):
 	user = models.OneToOneField(User)
 	can_analyse = models.BooleanField(default=False)
 	
 	def __unicode__(self):
 		return " ".join((self.user.username ,str(self.can_analyse)))
-		
+
+# A class for the groups
 class Group(models.Model):
 	teacher = models.ForeignKey(Teacher, unique = False)
 	academic_year = models.ForeignKey(AcademicYear, unique = False)
@@ -199,7 +204,7 @@ class Group(models.Model):
 	def __repr__(self):
 		return self.__unicode__()
 
-		
+# A class for the students
 class Student(models.Model):
 	teacher = models.ForeignKey(Teacher, unique = False)
 	group = models.ForeignKey(Group, unique = False)
@@ -210,7 +215,7 @@ class Student(models.Model):
 	def __repr__(self):
 		return self.__unicode__()
 		
-		
+# A class for a usage data of a step
 class UsageRecord(models.Model):
 	application = models.ForeignKey(Application, unique = False)
 	teacher = models.ForeignKey(Teacher, blank=True, null=True, unique = False)
@@ -242,7 +247,7 @@ class UsageRecord(models.Model):
 		self.step_number = self.step.order
 		super(UsageRecord, self).save(*args, **kwargs)
 
-
+# A class for the usage data of a step with a question
 class QuestionRecord(models.Model):
 	application = models.ForeignKey(Application, unique = False)
 	question = models.ForeignKey(Question, unique = False)
