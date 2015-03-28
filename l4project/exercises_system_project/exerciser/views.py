@@ -71,7 +71,6 @@ def log_info_db(request):
 		user=User.objects.filter(username=teacher_name)
 		teacher=Teacher.objects.filter(user=user)
 		
-		#### TODO maybe remove these checks. It is impossible that they don't exist.... ####
 		if len(teacher)>0:
 			teacher=teacher[0]
 			record.teacher = teacher
@@ -114,7 +113,7 @@ def log_question_info_db(request):
 	teacher_name=request.session.get("teacher",None)
 	session_id = request.session.session_key
 	print "session", session_id
-	answer_text = answer_text.replace('<', '&lt')#
+	answer_text = answer_text.replace('<', '&lt')
 	answer_text = answer_text.replace('>', '&gt')
 	try:
 		application = Application.objects.filter(name=application_name)[0]
@@ -342,7 +341,9 @@ def group_sheet_confirm(request):
 
 @requires_csrf_token
 def register_teacher_with_session(request):
-	print "in reg teacher"
+	"""
+	A function to register the teacher id entered for a pupil
+	"""
 	success=False
 	try:
 		teacher_username = request.POST['teacher']
@@ -362,10 +363,12 @@ def register_teacher_with_session(request):
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
 
-### Refactored ### similar to register_teacher_with_session, etc... Refactor Checks added. Looks Fine ###
+
 @requires_csrf_token
 def register_student_with_session(request):
-	print "in reg student"
+	"""
+	A function to register the student id entered for a pupil
+	"""
 	success=False
 	try:
 		student_name = request.POST['student']
@@ -392,8 +395,11 @@ def register_student_with_session(request):
 	print "success",success
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 
-### Checks added. Looks Fine ###
+
 def get_groups_for_year(request):
+	"""
+	A function to get the list of groups belonging to a particular teacher for a selected year.
+	"""
 	try:
 		year = request.POST['year']
 		teacher_username = request.session['teacher']
@@ -412,9 +418,12 @@ def get_groups_for_year(request):
 	groups = map(str, groups)
 	return HttpResponse(simplejson.dumps(groups), content_type="application/json")
 
-### Refactored Checks added. Looks Fine ###
+
 @requires_csrf_token
 def register_year_with_session(request):
+	"""
+	A function to register the year of the group entered for a pupil
+	"""
 	success=False
 	try:
 		year = request.POST['year']
@@ -434,10 +443,12 @@ def register_year_with_session(request):
 	return HttpResponse(simplejson.dumps(success),content_type = "application/json")
 	
 
-### Refactored ###
+
 @requires_csrf_token
 def reset_session(request):
-	
+	"""
+	A function to reset the session for a pupil.
+	"""
 	print "in reset"
 	if 'teacher' in request.session:
 		del request.session['teacher']
@@ -457,13 +468,16 @@ def reset_session(request):
 	
 	request.session.delete()
 	request.session.modified = True
-	#return HttpResponse("{}",content_type = "application/json")
 	
 	return HttpResponseRedirect('/weave/')
 	
-### Refactored ###
+
+	
 @requires_csrf_token
 def del_session_variable(request):
+	"""
+	A function to delete a session variable
+	"""
 	try:
 		to_delete=request.POST['to_delete']
 	except KeyError:
@@ -471,16 +485,15 @@ def del_session_variable(request):
 	print "in reset"
 	if to_delete in request.session:
 		del request.session[to_delete]
-		print "t"
-	#request.session.delete()
-	#request.session.modified = True
-	#return HttpResponse("{}",content_type = "application/json")
-	
+
 	return HttpResponseRedirect('/weave/')
 	
 
-### Refactored ###
+
 def index(request):
+	"""
+	A function to load the main page for the pupil interface
+	"""
 	# Request the context of the request.
 	# The context contains information such as the client's machine details, for example.
 	context = RequestContext(request)
@@ -501,57 +514,12 @@ def index(request):
 	return render_to_response('exerciser/index.html', context_dict, context)
 
 
-### Refactored ###
-"""
-@requires_csrf_token
-def submit_questionnaire(request):
-	print "in submit questionnaire"
-	
-	if 'skipped' not in request.POST:
-		# do what you need to do to say that a 
-	
-		context = RequestContext(request)
 
-		saved = False
-
-		# If it's a HTTP POST, we're interested in processing form data.
-		if request.method == 'POST':
-
-			questionnaire_form = SampleQuestionnaireForm(data=request.POST)
-
-			# If the form is valid...
-			if questionnaire_form.is_valid():
-				# Save the user's form data to the database.
-				questionnaire = questionnaire_form.save()
-				teacher_username = request.user
-				try:
-					user=User.objects.filter(username=teacher_username)[0]
-					teacher=Teacher.objects.filter(user=user)[0]
-					questionnaire.teacher=teacher
-				except IndexError:
-					pass
-				questionnaire.save()
-				saved = True
-
-			# Invalid form - mistakes or something else?
-			# Print problems to the terminal.
-			# They'll also be shown to the user.
-			else:
-				print questionnaire_form.errors
-		else:
-			form = SampleQuestionnaireForm()
-		
-		print saved,"form saved"
-		request.session['questionnaire_asked'] = True
-		return HttpResponseRedirect('/weave/teacher_interface')
-	
-	# Skipped is in; this should be an AJAX call
-	#request.session['questionnaire_asked'] = True
-	return HttpResponse('{}', content_type='application/json')
-"""
-
-### Refactored ###
 def application(request, application_name_url):
+	"""
+	A function to load the viewing page for a selected application. The name of the application is passed as the second parameter of the example.
+	"""
+	
 	context = RequestContext(request)
 	if 'student_registered' in request.session:
 		
@@ -605,9 +573,11 @@ def application(request, application_name_url):
 
 
 
-### Checks added. Looks fine ###
+
 def get_students(request):
-	print "in get students!"
+	"""
+	A function to get the student ids for the students belonging to a particular group.
+	"""
 	try:
 		group_name=request.GET['group']
 		year = request.GET['year']
@@ -629,7 +599,9 @@ def get_students(request):
 	
 	
 def get_largest_step(request):
-	print "in get largest step"
+	"""
+	A function to get the largest step for a chosen example.
+	"""
 	try:
 		app_name = request.GET['application']
 	except KeyError:
@@ -639,9 +611,11 @@ def get_largest_step(request):
 	print total_steps , "TOTAL STEPS"
 	return HttpResponse(simplejson.dumps({'steps':total_steps}), content_type="application/json")
 	
-### Checks added. Looks fine ###
+
 def get_groups(request):
-	print "in get groups!"
+	"""
+	A function to get the groups of a particular teacher.
+	"""
 	try:
 		year = request.GET['year']
 	except KeyError:
@@ -669,9 +643,11 @@ def get_groups(request):
 	print groups, "G"
 	return HttpResponse(simplejson.dumps(groups), content_type="application/json")
 	
-### Checks added. Looks fine ###
+
 def get_steps(request):
-	print "in get steps"
+	"""
+	A function to get the steps of a selected example.
+	"""
 	try:
 		app_name = request.GET['app_name']
 	except KeyError:
@@ -686,9 +662,14 @@ def get_steps(request):
 	steps = Step.objects.filter(application=application)
 	steps = map(str,steps)
 	return HttpResponse(simplejson.dumps(steps), content_type="application/json")
-### Refactored ###
-#@login_required		
+
+
+# Use the login_required() decorator to ensure only those logged in can access the view.
+@login_required		
 def get_question_data(request):
+	"""
+	A function to get the data recorded for answers of a question of a particular example. It only retrieves information about a selected group belonging to the logged in teacher.
+	"""
 	print "in get question data"
 	app_name=request.GET.get('app_name',None)
 	year=request.GET.get('year',None)
@@ -757,10 +738,12 @@ def get_question_data(request):
 		sd.append({option.content:times_chosen,'students':student_list})
 	selected_data['question']=quest_text
 	selected_data['data']=sd
-	#print sd
 	return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")	
+
+	
 def update_time_graph(request):
 	"""
+	A function to retrieve the data for the time spent at each step of an example.
 	If no student ID is passed, then you produce data for an group average graph.
 	Otherwise, you get the total time for the student.
 	"""
@@ -848,14 +831,15 @@ def update_time_graph(request):
 				sd.append({"y":time['time'],"revisited_count":revisited_steps_count,"explanation":explanation_text,"explanation_start":explanation_text_start})
 	if sd!=[]:
 		selected_data["data"]=sd
-		#print sd , " SD PRINTED"
 		selected_data["question_steps"]=question_steps
 
 	return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
 	
-### Checks added. ###
+
 def update_class_steps_graph(request):
-	print "class steps"
+	"""
+	A function to retrieve the data needed for the class steps graph.
+	"""
 	try:
 		app_name=request.GET['application']
 		print app_name
@@ -896,8 +880,11 @@ def update_class_steps_graph(request):
 	return HttpResponse(simplejson.dumps(selected_data), content_type="application/json")
 
 
-### Refactored Checks added Looks ok ###
+
 def populate_summary_table(request):
+	"""
+	A function to get the data for the class summary table.
+	"""
 	try:
 		application=request.GET['application']
 		academic_year=request.GET['year']
@@ -949,6 +936,9 @@ def populate_summary_table(request):
 	return HttpResponse(simplejson.dumps({"selected_data":selected_data,"total_steps":total_steps}), content_type="application/json")	
 
 def get_application_questions(request):
+	"""
+	A function to get the questions for a selected example.
+	"""
 	try:
 		application = request.GET['application']
 	except KeyError:
@@ -964,9 +954,12 @@ def get_application_questions(request):
 	print questions, "questions"
 	return HttpResponse(simplejson.dumps(questions), content_type="application/json")
 
-### Refactored. Ask if I have to check if request was get/post ###
+
 @requires_csrf_token
 def teacher_interface(request):
+	"""
+	A function to load the main page for the teacher interface.
+	"""
 	# Request the context of the request.
 	# The context contains information such as the client's machine details, for example.
 	context = RequestContext(request)
@@ -975,7 +968,6 @@ def teacher_interface(request):
 	academic_years = AcademicYear.objects.all()
 
 	user_form = UserForm()
-	#group_form = GroupForm()
 
 	groups={}
 
@@ -991,9 +983,6 @@ def teacher_interface(request):
 				group_names.append(str(group.name))
 			groups[academic_year.start]= group_names
 
-
-	#questionnaire_form = SampleQuestionnaireForm()
-
 	context_dict = {'applications' : application_list,'user_form': user_form, 'groups': groups,'academic_years':academic_years}
 	
 	
@@ -1002,11 +991,14 @@ def teacher_interface(request):
 	# Note that the first parameter is the template we wish to use.
 	return render_to_response('exerciser/teacher_interface.html', context_dict, context)
 
-#def questionnaire_asked(request):
 
-### Refactored. Ask if I have to check if request was get/post ###
+
+
 def register(request):
-	print "in register"
+	"""
+	A function to deal with the registration of a new teacher.
+	"""
+	
 	# Like before, get the request's context.
 	context = RequestContext(request)
 
@@ -1020,7 +1012,6 @@ def register(request):
 		# Attempt to grab information from the raw form information.
 		# Note that we make use of both UserForm and UserProfileForm.
 		user_form = UserForm(data=request.POST)
-		#group_form = GroupForm(data=request.POST)
 
 		# If the form is valid...
 		if user_form.is_valid():
@@ -1056,7 +1047,7 @@ def register(request):
 		# Print problems to the terminal.
 		# They'll also be shown to the user.
 		else:
-			print user_form.errors #, group_form.errors
+			print user_form.errors , group_form.errors
 
 	print registered,"registered"
 	request.session['registered'] = registered
@@ -1064,29 +1055,11 @@ def register(request):
 	return HttpResponseRedirect('/weave/teacher_interface')
 	
 
-### Looks OK ###
-"""
-def questionnaire(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = SampleQuestionnaireForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/weave/teacher_interface')
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = SampleQuestionnaireForm()
-
-    return render(request, 'exerciser/questionnaire.html', {'form': form})
-"""
-	
-### Looks OK ###
 def user_login(request):
+	"""
+	A function for logging in of the user.
+	"""
 	# Like before, obtain the context for the user's request.
 	context = RequestContext(request)
 	# If the request is a HTTP POST, try to pull out the relevant information.
@@ -1121,10 +1094,12 @@ def user_login(request):
 	request.session['successful_login'] = successful_login
 	return HttpResponseRedirect('/weave/teacher_interface')
 
-### Refactored ###
-#@login_required
+# Use the login_required() decorator to ensure only those logged in can access the view.
+@login_required
 def statistics(request):
-
+	"""
+	A function to load the page with the pupils' progress- the graphs page in the teacher interface.
+	"""
 	context = RequestContext(request)
 	teacher_username = request.user
 	try:
@@ -1152,12 +1127,13 @@ def statistics(request):
 	return render_to_response('exerciser/graph_viewer.html', context_dict, context)
 
 # Use the login_required() decorator to ensure only those logged in can access the view.
-
-### Looks OK ###
-#@login_required
+@login_required
 def user_logout(request):
-    # Since we know the user is logged in, we can now just log them out.
-    logout(request)
+	"""
+	A function to log out a teacher.
+	"""
+	# Since we know the user is logged in, we can now just log them out.
+	logout(request)
 
-    # Take the user back to the homepage.
-    return HttpResponseRedirect('/weave/teacher_interface')
+	# Take the user back to the homepage.
+	return HttpResponseRedirect('/weave/teacher_interface')
