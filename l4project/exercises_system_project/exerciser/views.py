@@ -127,7 +127,6 @@ def log_question_info_db(request):
 		except IndexError:
 			return HttpResponse(simplejson.dumps({'error':'Bad input supplied'}), content_type="application/json")
 		question_record.answer=answer
-
 	if teacher_name != None:
 		user=User.objects.filter(username=teacher_name)
 		teacher=Teacher.objects.filter(user=user)
@@ -152,7 +151,7 @@ def log_question_info_db(request):
 							student = Student.objects.filter(teacher=teacher,group=group,student_id=student_name)
 							if len(student) > 0:
 								student=student[0]
-								question_record.student = student
+								usage_record.student = student
 								question_record.student = student
 	usage_record.save()
 	question_record.save()
@@ -955,7 +954,7 @@ def register(request):
 		# Print problems to the terminal.
 		# They'll also be shown to the user.
 		else:
-			print user_form.errors , group_form.errors
+			print user_form.errors
 
 	request.session['registered'] = registered
 	# Render the template depending on the context.

@@ -1,3 +1,0 @@
-TODO:
-
-population scripts -handle exceptions | make the file path configurable (for the xml files)
