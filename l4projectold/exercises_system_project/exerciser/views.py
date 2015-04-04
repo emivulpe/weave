@@ -180,7 +180,7 @@ def student_group_list(request):
 	students=Student.objects.filter(teacher=teacher,group=group)
 	selected_year = selected_year +'/'+ str(int(selected_year)+1)
 	request.session['information_shown'] = True
-	return render_to_response('exerciser/group_sheet.html', {'students':students, 'group':group_name, 'year':selected_year}, context)
+	return render_to_response('exerciser/groupSheet.html', {'students':students, 'group':group_name, 'year':selected_year}, context)
 	
 
 
