@@ -1,0 +1,28 @@
+1) Ensure you have Python 2.7.x (minimum 2.7.5) installed and active on your installation.
+
+2) Ensure you have the following Python packages installed - either globally, or on a virtual environment:
+
+	- django-chartit (0.1)
+	- Django (1.5.4)
+	- simplejson (3.6.5)
+	
+   Packages can be installed easily with the pip package manager, e.g.:
+   pip install <package_name>==<version>
+   pip install django-chartit==0.1
+   pip install Django==1.5.4
+   pip install simplejson==3.6.5
+   
+   You may be required to install pip/virtualenv/virtualenvwrapper depending on your installation's setup.
+
+3) Run git clone https://github.com/emivulpe/weave_to_submit.git
+	or
+   Open the weave_to_submit directory that was submitted
+
+4) Navigate to l4project/exercises_system_project/
+
+5) Run python manage.py runserver to start the server.
+
+6) Open your web browser of choice and navigate to http://127.0.0.1:8000/weave/ for the student interface. For the teacher interface, navigate to: http://127.0.0.1:8000/weave/teacher_interface/
+
+   Best results can be obtained with Google Chrome.
+
